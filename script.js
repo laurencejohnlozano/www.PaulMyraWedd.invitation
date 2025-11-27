@@ -23,103 +23,77 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 400);
         });
     });
-});
-var envelope = document.getElementById("envelope");
-var invitation = document.getElementById("invitation");
-var isAnimating = false;
 
-envelope.addEventListener("click", function (e) {
-    if (!envelope.classList.contains("open") && !isAnimating) {
-        isAnimating = true;
-        envelope.classList.add("open");
-        
-        // Start music on mobile when user interacts
-        var musicFrame = document.getElementById('musicFrame');
-        if (musicFrame && musicFrame.contentWindow) {
-            musicFrame.contentWindow.postMessage('startMusic', '*');
-        }
-        
-        setTimeout(function () {
-            invitation.classList.add("show");
-            isAnimating = false;
-        }, 600);
-    }
-    e.stopPropagation();
-});
+    // Envelope interaction
+    var envelope = document.getElementById("envelope");
+    var invitation = document.getElementById("invitation");
+    var isAnimating = false;
 
-invitation.addEventListener("click", function (e) {
-    if (invitation.classList.contains("show") && !isAnimating) {
-        window.location.href = "homepage/homepage.html";
-    }
-    e.stopPropagation();
-});
-// Music Toggle Control
-var musicFrame = document.getElementById('musicFrame');
-var musicToggle = document.getElementById('musicToggle');
-var musicIcon = document.querySelector('.music-icon');
-
-// Wait for iframe to load
-musicFrame.onload = function () {
-    // Get initial music state
-    musicFrame.contentWindow.postMessage('getMusicState', '*');
-};
-
-// Listen for music state updates
-window.addEventListener('message', function (event) {
-    if (event.data.musicPlaying !== undefined) {
-        if (event.data.musicPlaying) {
-            musicIcon.textContent = '🔊';
-            musicToggle.classList.remove('muted');
-        } else {
-            musicIcon.textContent = '🔇';
-            musicToggle.classList.add('muted');
-        }
-    }
-});
-
-// Toggle music button
-musicToggle.addEventListener('click', function (e) {
-    e.stopPropagation();
-    musicFrame.contentWindow.postMessage('toggleMusic', '*');
-});
-
-        // Try to play immediately (works on desktop)
-        startMusic();
-
-        // Save time every second
-        setInterval(function () {
-            if (!bgMusic.paused) {
-                sessionStorage.setItem('musicTime', bgMusic.currentTime);
-            }
-        }, 1000);
-
-        // Listen for commands from parent pages
-        window.addEventListener('message', function (event) {
-            if (event.data === 'startMusic') {
-                // Force start music when envelope is clicked
-                startMusic();
-            } else if (event.data === 'toggleMusic') {
-                if (bgMusic.paused) {
-                    bgMusic.play();
-                    sessionStorage.setItem('musicPlaying', 'true');
-                    event.source.postMessage({ musicPlaying: true }, '*');
-                } else {
-                    bgMusic.pause();
-                    sessionStorage.setItem('musicPlaying', 'false');
-                    event.source.postMessage({ musicPlaying: false }, '*');
+    if (envelope && invitation) {
+        envelope.addEventListener("click", function (e) {
+            if (!envelope.classList.contains("open") && !isAnimating) {
+                isAnimating = true;
+                envelope.classList.add("open");
+                
+                // Start music on mobile when user interacts
+                var musicFrame = document.getElementById('musicFrame');
+                if (musicFrame && musicFrame.contentWindow) {
+                    musicFrame.contentWindow.postMessage('startMusic', '*');
                 }
-            } else if (event.data === 'getMusicState') {
-                event.source.postMessage({
-                    musicPlaying: !bgMusic.paused
-                }, '*');
+                
+                setTimeout(function () {
+                    invitation.classList.add("show");
+                    isAnimating = false;
+                }, 600);
             }
+            e.stopPropagation();
         });
 
-        // Save time before page unload
-        window.addEventListener('beforeunload', function () {
-            sessionStorage.setItem('musicTime', bgMusic.currentTime);
+        invitation.addEventListener("click", function (e) {
+            if (invitation.classList.contains("show") && !isAnimating) {
+                window.location.href = "homepage/homepage.html";
+            }
+            e.stopPropagation();
         });
-    </script>
-</body>
-</html>
+    }
+
+    // Music Toggle Control (only if elements exist)
+    var musicFrame = document.getElementById('musicFrame');
+    var musicToggle = document.getElementById('musicToggle');
+    var musicIcon = document.querySelector('.music-icon');
+
+    if (musicFrame) {
+        // Wait for iframe to load
+        musicFrame.onload = function () {
+            // Get initial music state
+            if (musicFrame.contentWindow) {
+                musicFrame.contentWindow.postMessage('getMusicState', '*');
+            }
+        };
+    }
+
+    // Listen for music state updates
+    window.addEventListener('message', function (event) {
+        if (event.data.musicPlaying !== undefined && musicIcon && musicToggle) {
+            if (event.data.musicPlaying) {
+                musicIcon.textContent = '🔊';
+                musicToggle.classList.remove('muted');
+            } else {
+                musicIcon.textContent = '🔇';
+                musicToggle.classList.add('muted');
+            }
+        }
+    });
+
+    // Toggle music button
+    if (musicToggle && musicFrame) {
+        musicToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (musicFrame.contentWindow) {
+                musicFrame.contentWindow.postMessage('toggleMusic', '*');
+            }
+        });
+    }
+});
+
 
