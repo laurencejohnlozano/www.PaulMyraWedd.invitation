@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // Music Control - Direct Audio (no iframe)
+    // Music Control - Works on both PC and Mobile
     var bgMusic = document.getElementById('bgMusic');
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
@@ -92,28 +92,30 @@ document.addEventListener('DOMContentLoaded', function () {
         
         console.log('Music state:', { musicState, savedTime, hasInteracted });
 
-        // Set saved time
+        // Set saved time when metadata loads
         if (savedTime > 0) {
             bgMusic.addEventListener('loadedmetadata', function() {
                 bgMusic.currentTime = savedTime;
+                console.log('Restored music time to:', savedTime);
             }, { once: true });
         }
 
         // Function to start music
         function startMusic() {
+            console.log('Attempting to start music');
             bgMusic.play().then(function() {
-                console.log('Music playing');
+                console.log('✓ Music playing');
                 sessionStorage.setItem('musicPlaying', 'true');
                 if (musicIcon && musicToggle) {
                     musicIcon.textContent = '🔊';
                     musicToggle.classList.remove('muted');
                 }
             }).catch(function(error) {
-                console.log('Play blocked:', error.message);
+                console.log('✗ Music blocked:', error.message);
             });
         }
 
-        // Auto-start if was playing
+        // Try to auto-start (works on PC, blocked on mobile)
         if (musicState === 'true' && hasInteracted) {
             setTimeout(startMusic, 300);
         }
@@ -125,16 +127,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }, 1000);
 
-        // Resume on user interaction
-        var interacted = false;
-        function handleInteraction() {
-            if (!interacted && musicState === 'true') {
-                interacted = true;
+        // CRITICAL FOR MOBILE: Resume music on ANY user interaction
+        var musicResumed = false;
+        function resumeMusic() {
+            if (!musicResumed && musicState === 'true' && hasInteracted && bgMusic.paused) {
+                musicResumed = true;
+                console.log('User touched screen - resuming music');
                 startMusic();
             }
         }
-        document.addEventListener('touchstart', handleInteraction, { once: true, passive: true });
-        document.addEventListener('click', handleInteraction, { once: true });
+
+        // Listen for ANY touch/click to resume music
+        document.addEventListener('touchstart', resumeMusic, { once: true, passive: true });
+        document.addEventListener('touchend', resumeMusic, { once: true, passive: true });
+        document.addEventListener('click', resumeMusic, { once: true });
 
         // Toggle button
         if (musicToggle) {
@@ -146,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     bgMusic.pause();
                     sessionStorage.setItem('musicPlaying', 'false');
+                    console.log('Music paused by user');
                     if (musicIcon) {
                         musicIcon.textContent = '🔇';
                         musicToggle.classList.add('muted');
@@ -153,8 +160,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
+    } else {
+        console.error('bgMusic element not found!');
     }
 
     console.log('Homepage initialization complete');
 });
+
 
