@@ -1,4 +1,4 @@
-﻿// Smooth Page Transition
+// Smooth Page Transition
 document.addEventListener('DOMContentLoaded', function () {
     // Intercept all navigation links
     var links = document.querySelectorAll('a[href$=".html"]');
@@ -67,13 +67,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Wait for iframe to load
     musicFrame.onload = function () {
-        // Get initial music state
+        // Get initial music state and start music
         try {
-            musicFrame.contentWindow.postMessage('getMusicState', '*');
+            if (musicFrame.contentWindow) {
+                setTimeout(function() {
+                    musicFrame.contentWindow.postMessage('startMusic', '*');
+                    musicFrame.contentWindow.postMessage('getMusicState', '*');
+                }, 200);
+            }
         } catch (e) {
             console.error('Error communicating with music frame:', e);
         }
     };
+
+    // Immediate attempt
+    setTimeout(function() {
+        if (musicFrame.contentWindow) {
+            try {
+                musicFrame.contentWindow.postMessage('startMusic', '*');
+            } catch (e) {}
+        }
+    }, 500);
 
     // Listen for music state updates
     window.addEventListener('message', function (event) {
@@ -97,4 +111,3 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error toggling music:', e);
         }
     });
-});
