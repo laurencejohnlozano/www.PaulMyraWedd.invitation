@@ -82,64 +82,66 @@ document.addEventListener('DOMContentLoaded', function () {
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
     
-    console.log('bgMusic element:', bgMusic);
-    
     if (bgMusic) {
         // Get saved music state
         var musicState = sessionStorage.getItem('musicPlaying');
         var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
         var hasInteracted = sessionStorage.getItem('hasInteracted') === 'true';
         
-        console.log('Music state from sessionStorage:', {
-            musicState: musicState,
-            savedTime: savedTime,
-            hasInteracted: hasInteracted,
-            bgMusicPaused: bgMusic.paused
-        });
+        console.log('Music state:', { musicState, savedTime, hasInteracted });
 
-        // Create resume button IMMEDIATELY
+        // Create smaller resume button
         var resumeBtn = document.createElement('div');
         resumeBtn.id = 'musicResumeBtn';
-        resumeBtn.innerHTML = '🎵 Tap to Continue Music';
+        resumeBtn.innerHTML = '🎵 Tap to Continue';
         resumeBtn.style.cssText = `
             position: fixed;
-            top: 50%;
+            bottom: 100px;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             background: linear-gradient(135deg, #5C0A0A, #3D0707);
             color: #F8F4F0;
-            padding: 20px 40px;
-            border-radius: 50px;
+            padding: 12px 25px;
+            border-radius: 30px;
             font-family: 'Playfair Display', serif;
-            font-size: 18px;
+            font-size: 14px;
             cursor: pointer;
             z-index: 10000;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: none;
         `;
 
         document.body.appendChild(resumeBtn);
-        console.log('Resume button created and added to page');
 
-        // ALWAYS show button if music should be playing
-        if (musicState === 'true' && hasInteracted) {
-            console.log('Music should be playing - showing button immediately');
-            resumeBtn.style.display = 'block';
-        }
-
-        // Set saved time when metadata loads
+        // CRITICAL: Set saved time BEFORE attempting to play
+        var timeSet = false;
         if (savedTime > 0) {
-            bgMusic.addEventListener('loadedmetadata', function() {
+            // Try to set time immediately if metadata is loaded
+            if (bgMusic.readyState >= 2) {
                 bgMusic.currentTime = savedTime;
-                console.log('Restored music time to:', savedTime);
-            }, { once: true });
+                timeSet = true;
+                console.log('Set time immediately to:', savedTime);
+            } else {
+                // Wait for metadata to load
+                bgMusic.addEventListener('loadedmetadata', function() {
+                    bgMusic.currentTime = savedTime;
+                    timeSet = true;
+                    console.log('Set time after metadata load to:', savedTime);
+                }, { once: true });
+            }
         }
 
         // Function to start music
         function startMusic() {
-            console.log('startMusic() called');
+            console.log('Starting music at time:', bgMusic.currentTime);
+            
+            // Make sure time is set before playing
+            if (savedTime > 0 && !timeSet) {
+                bgMusic.currentTime = savedTime;
+            }
+            
             bgMusic.play().then(function() {
-                console.log('✓ Music playing successfully');
+                console.log('✓ Music playing from:', bgMusic.currentTime);
                 sessionStorage.setItem('musicPlaying', 'true');
                 resumeBtn.style.display = 'none';
                 if (musicIcon && musicToggle) {
@@ -147,23 +149,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     musicToggle.classList.remove('muted');
                 }
             }).catch(function(error) {
-                console.log('✗ Music blocked:', error.message);
+                console.log('✗ Play blocked:', error.message);
                 resumeBtn.style.display = 'block';
             });
         }
 
+        // Show button if music should be playing
+        if (musicState === 'true' && hasInteracted) {
+            resumeBtn.style.display = 'block';
+        }
+
         // Resume button click
         resumeBtn.addEventListener('click', function() {
-            console.log('Resume button clicked!');
+            console.log('Resume button clicked');
             startMusic();
         });
 
         // Try auto-start (works on PC only)
         if (musicState === 'true' && hasInteracted) {
+            // Wait a bit for metadata to load
             setTimeout(function() {
-                console.log('Attempting auto-start...');
                 bgMusic.play().then(function() {
-                    console.log('✓ Auto-start successful (PC)');
+                    console.log('✓ Auto-start successful');
                     resumeBtn.style.display = 'none';
                     sessionStorage.setItem('musicPlaying', 'true');
                     if (musicIcon && musicToggle) {
@@ -171,8 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         musicToggle.classList.remove('muted');
                     }
                 }).catch(function(error) {
-                    console.log('✗ Auto-start blocked (Mobile) - button should be visible');
-                    // Button already visible from above
+                    console.log('✗ Auto-start blocked - showing button');
                 });
             }, 500);
         }
@@ -202,10 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-    } else {
-        console.error('❌ bgMusic element NOT FOUND!');
     }
 
     console.log('Homepage initialization complete');
 });
-
