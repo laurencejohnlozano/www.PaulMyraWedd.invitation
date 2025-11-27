@@ -1,4 +1,4 @@
-/ Smooth Page Transition
+// Smooth Page Transition
 document.addEventListener('DOMContentLoaded', function () {
     // Intercept all navigation links
     var links = document.querySelectorAll('a[href$=".html"]');
@@ -82,3 +82,44 @@ musicToggle.addEventListener('click', function (e) {
     e.stopPropagation();
     musicFrame.contentWindow.postMessage('toggleMusic', '*');
 });
+
+        // Try to play immediately (works on desktop)
+        startMusic();
+
+        // Save time every second
+        setInterval(function () {
+            if (!bgMusic.paused) {
+                sessionStorage.setItem('musicTime', bgMusic.currentTime);
+            }
+        }, 1000);
+
+        // Listen for commands from parent pages
+        window.addEventListener('message', function (event) {
+            if (event.data === 'startMusic') {
+                // Force start music when envelope is clicked
+                startMusic();
+            } else if (event.data === 'toggleMusic') {
+                if (bgMusic.paused) {
+                    bgMusic.play();
+                    sessionStorage.setItem('musicPlaying', 'true');
+                    event.source.postMessage({ musicPlaying: true }, '*');
+                } else {
+                    bgMusic.pause();
+                    sessionStorage.setItem('musicPlaying', 'false');
+                    event.source.postMessage({ musicPlaying: false }, '*');
+                }
+            } else if (event.data === 'getMusicState') {
+                event.source.postMessage({
+                    musicPlaying: !bgMusic.paused
+                }, '*');
+            }
+        });
+
+        // Save time before page unload
+        window.addEventListener('beforeunload', function () {
+            sessionStorage.setItem('musicTime', bgMusic.currentTime);
+        });
+    </script>
+</body>
+</html>
+
