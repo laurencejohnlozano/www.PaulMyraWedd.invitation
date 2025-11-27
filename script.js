@@ -1,4 +1,5 @@
 ﻿
+
 // Smooth Page Transition
 document.addEventListener('DOMContentLoaded', function () {
     // Intercept all navigation links
@@ -75,5 +76,4 @@ window.addEventListener('message', function (event) {
 musicToggle.addEventListener('click', function (e) {
     e.stopPropagation();
     musicFrame.contentWindow.postMessage('toggleMusic', '*');
-
 });
