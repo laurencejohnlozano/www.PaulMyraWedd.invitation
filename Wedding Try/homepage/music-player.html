@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Music Player</title>
+</head>
+<body>
+    <audio id="bgMusic" loop>
+        <source src="wedding-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        var bgMusic = document.getElementById('bgMusic');
+
+        // Get saved music state and time
+        var musicState = localStorage.getItem('musicPlaying');
+        var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
+
+        // Set the saved time
+        bgMusic.currentTime = savedTime;
+
+        // Auto play if it was playing before
+        if (musicState !== 'false') {
+            bgMusic.play().catch(function () {
+                // Autoplay blocked
+            });
+        }
+
+        // Save time every second
+        setInterval(function () {
+            if (!bgMusic.paused) {
+                sessionStorage.setItem('musicTime', bgMusic.currentTime);
+            }
+        }, 1000);
+
+        // Listen for commands from parent pages
+        window.addEventListener('message', function (event) {
+            if (event.data === 'toggleMusic') {
+                if (bgMusic.paused) {
+                    bgMusic.play();
+                    localStorage.setItem('musicPlaying', 'true');
+                    event.source.postMessage({ musicPlaying: true }, '*');
+                } else {
+                    bgMusic.pause();
+                    localStorage.setItem('musicPlaying', 'false');
+                    event.source.postMessage({ musicPlaying: false }, '*');
+                }
+            } else if (event.data === 'getMusicState') {
+                event.source.postMessage({
+                    musicPlaying: !bgMusic.paused
+                }, '*');
+            }
+        });
+
+        // Save time before page unload
+        window.addEventListener('beforeunload', function () {
+            sessionStorage.setItem('musicTime', bgMusic.currentTime);
+        });
+    </script>
+</body>
+</html>
