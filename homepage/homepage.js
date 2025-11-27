@@ -11,6 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             e.preventDefault();
+            
+            // Save music state before navigation
+            var bgMusic = document.getElementById('bgMusic');
+            if (bgMusic && !bgMusic.paused) {
+                sessionStorage.setItem('musicTime', bgMusic.currentTime);
+                sessionStorage.setItem('musicPlaying', 'true');
+            }
+            
             document.body.classList.add('fade-out');
             setTimeout(function () {
                 window.location.href = href;
@@ -69,68 +77,84 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // Music Control - Enhanced for mobile
-    var musicFrame = document.getElementById('musicFrame');
+    // Music Control - Direct Audio (no iframe)
+    var bgMusic = document.getElementById('bgMusic');
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
+    
+    if (bgMusic) {
+        console.log('Music element found');
+        
+        // Get saved music state
+        var musicState = sessionStorage.getItem('musicPlaying');
+        var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
+        var hasInteracted = sessionStorage.getItem('hasInteracted') === 'true';
+        
+        console.log('Music state:', { musicState, savedTime, hasInteracted });
 
-    if (musicFrame) {
-        console.log('Music frame found on homepage');
+        // Set saved time
+        if (savedTime > 0) {
+            bgMusic.addEventListener('loadedmetadata', function() {
+                bgMusic.currentTime = savedTime;
+            }, { once: true });
+        }
 
-        // Wait for iframe to load
-        musicFrame.onload = function () {
-            console.log('Music frame loaded on homepage');
-            if (musicFrame.contentWindow) {
-                // Try to resume music on mobile
-                setTimeout(function() {
-                    try {
-                        musicFrame.contentWindow.postMessage('startMusic', '*');
-                        musicFrame.contentWindow.postMessage('getMusicState', '*');
-                        console.log('Sent startMusic and getMusicState to iframe');
-                    } catch (err) {
-                        console.log('Music frame communication error:', err);
-                    }
-                }, 200);
-            }
-        };
-
-        // Also try to start music immediately in case iframe is already loaded
-        setTimeout(function() {
-            if (musicFrame.contentWindow) {
-                try {
-                    musicFrame.contentWindow.postMessage('startMusic', '*');
-                    console.log('Sent immediate startMusic message');
-                } catch (err) {
-                    console.log('Immediate music start error:', err);
+        // Function to start music
+        function startMusic() {
+            bgMusic.play().then(function() {
+                console.log('Music playing');
+                sessionStorage.setItem('musicPlaying', 'true');
+                if (musicIcon && musicToggle) {
+                    musicIcon.textContent = '🔊';
+                    musicToggle.classList.remove('muted');
                 }
-            }
-        }, 500);
-    }
+            }).catch(function(error) {
+                console.log('Play blocked:', error.message);
+            });
+        }
 
-    // Listen for music state updates
-    window.addEventListener('message', function (event) {
-        if (event.data.musicPlaying !== undefined && musicIcon && musicToggle) {
-            console.log('Music state received:', event.data.musicPlaying);
-            if (event.data.musicPlaying) {
-                musicIcon.textContent = '🔊';
-                musicToggle.classList.remove('muted');
-            } else {
-                musicIcon.textContent = '🔇';
-                musicToggle.classList.add('muted');
+        // Auto-start if was playing
+        if (musicState === 'true' && hasInteracted) {
+            setTimeout(startMusic, 300);
+        }
+
+        // Save time periodically
+        setInterval(function () {
+            if (!bgMusic.paused) {
+                sessionStorage.setItem('musicTime', bgMusic.currentTime);
+            }
+        }, 1000);
+
+        // Resume on user interaction
+        var interacted = false;
+        function handleInteraction() {
+            if (!interacted && musicState === 'true') {
+                interacted = true;
+                startMusic();
             }
         }
-    });
+        document.addEventListener('touchstart', handleInteraction, { once: true, passive: true });
+        document.addEventListener('click', handleInteraction, { once: true });
 
-    // Toggle music button
-    if (musicToggle && musicFrame) {
-        musicToggle.addEventListener('click', function (e) {
-            e.stopPropagation();
-            if (musicFrame.contentWindow) {
-                musicFrame.contentWindow.postMessage('toggleMusic', '*');
-            }
-        });
+        // Toggle button
+        if (musicToggle) {
+            musicToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (bgMusic.paused) {
+                    sessionStorage.setItem('hasInteracted', 'true');
+                    startMusic();
+                } else {
+                    bgMusic.pause();
+                    sessionStorage.setItem('musicPlaying', 'false');
+                    if (musicIcon) {
+                        musicIcon.textContent = '🔇';
+                        musicToggle.classList.add('muted');
+                    }
+                }
+            });
+        }
     }
 
-    console.log('Homepage script initialization complete');
+    console.log('Homepage initialization complete');
 });
 
