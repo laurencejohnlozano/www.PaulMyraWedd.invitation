@@ -1,6 +1,4 @@
-﻿
-
-// Smooth Page Transition
+/ Smooth Page Transition
 document.addEventListener('DOMContentLoaded', function () {
     // Intercept all navigation links
     var links = document.querySelectorAll('a[href$=".html"]');
@@ -34,6 +32,13 @@ envelope.addEventListener("click", function (e) {
     if (!envelope.classList.contains("open") && !isAnimating) {
         isAnimating = true;
         envelope.classList.add("open");
+        
+        // Start music on mobile when user interacts
+        var musicFrame = document.getElementById('musicFrame');
+        if (musicFrame && musicFrame.contentWindow) {
+            musicFrame.contentWindow.postMessage('startMusic', '*');
+        }
+        
         setTimeout(function () {
             invitation.classList.add("show");
             isAnimating = false;
