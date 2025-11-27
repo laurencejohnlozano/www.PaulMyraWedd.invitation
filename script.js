@@ -43,7 +43,7 @@ envelope.addEventListener("click", function (e) {
 
 invitation.addEventListener("click", function (e) {
     if (invitation.classList.contains("show") && !isAnimating) {
-        window.location.href = "../homepage/homepage.html";
+        window.location.href = "homepage/homepage.html";
     }
     e.stopPropagation();
 });
@@ -75,4 +75,5 @@ window.addEventListener('message', function (event) {
 musicToggle.addEventListener('click', function (e) {
     e.stopPropagation();
     musicFrame.contentWindow.postMessage('toggleMusic', '*');
+
 });
