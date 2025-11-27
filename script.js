@@ -1,6 +1,6 @@
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('DOM loaded');
+    console.log('DOM loaded - Wedding invitation script starting');
 
     // Smooth Page Transition
     var links = document.querySelectorAll('a[href$=".html"]');
@@ -22,26 +22,30 @@ document.addEventListener('DOMContentLoaded', function () {
     var envelope = document.getElementById("envelope");
     var invitation = document.getElementById("invitation");
     var isAnimating = false;
+    var hasOpened = false;
 
-    console.log('Envelope:', envelope);
-    console.log('Invitation:', invitation);
+    console.log('Envelope element:', envelope);
+    console.log('Invitation element:', invitation);
 
     if (envelope && invitation) {
-        // Handle both click and touch events for mobile
-        function openEnvelope(e) {
-            console.log('Envelope clicked/touched');
-            if (!envelope.classList.contains("open") && !isAnimating) {
+        // Function to open envelope
+        function openEnvelope() {
+            console.log('openEnvelope called - hasOpened:', hasOpened, 'isAnimating:', isAnimating);
+            if (!hasOpened && !isAnimating) {
+                hasOpened = true;
                 isAnimating = true;
                 envelope.classList.add("open");
-                console.log('Opening envelope');
+                console.log('Envelope opened - class added');
                 
                 // Start music on user interaction
                 var musicFrame = document.getElementById('musicFrame');
                 if (musicFrame) {
                     setTimeout(function() {
                         try {
-                            musicFrame.contentWindow.postMessage('startMusic', '*');
-                            console.log('Music start message sent');
+                            if (musicFrame.contentWindow) {
+                                musicFrame.contentWindow.postMessage('startMusic', '*');
+                                console.log('Music start message sent');
+                            }
                         } catch (err) {
                             console.log('Music error:', err);
                         }
@@ -51,31 +55,48 @@ document.addEventListener('DOMContentLoaded', function () {
                 setTimeout(function () {
                     invitation.classList.add("show");
                     isAnimating = false;
-                    console.log('Invitation shown');
+                    console.log('Invitation card shown');
                 }, 600);
             }
-            e.preventDefault();
-            e.stopPropagation();
         }
 
-        // Add both click and touchstart for mobile compatibility
-        envelope.addEventListener("click", openEnvelope);
-        envelope.addEventListener("touchstart", openEnvelope);
+        // Handle envelope click/touch - use multiple event types for better mobile support
+        envelope.addEventListener("click", function (e) {
+            console.log('Envelope CLICK event');
+            openEnvelope();
+        });
 
-        function goToHomepage(e) {
-            console.log('Invitation clicked/touched');
+        envelope.addEventListener("touchend", function (e) {
+            console.log('Envelope TOUCHEND event');
+            e.preventDefault(); // Prevent click event from also firing
+            openEnvelope();
+        }, { passive: false });
+
+        // Handle invitation card click/touch
+        function goToHomepage() {
+            console.log('goToHomepage called - invitation has show class:', invitation.classList.contains("show"));
             if (invitation.classList.contains("show") && !isAnimating) {
                 console.log('Navigating to homepage');
                 window.location.href = "homepage/homepage.html";
             }
-            e.preventDefault();
-            e.stopPropagation();
         }
 
-        invitation.addEventListener("click", goToHomepage);
-        invitation.addEventListener("touchstart", goToHomepage);
+        invitation.addEventListener("click", function (e) {
+            console.log('Invitation CLICK event');
+            goToHomepage();
+        });
+
+        invitation.addEventListener("touchend", function (e) {
+            console.log('Invitation TOUCHEND event');
+            e.preventDefault();
+            goToHomepage();
+        }, { passive: false });
+
+        console.log('Event listeners attached successfully');
     } else {
-        console.error('Envelope or invitation element not found!');
+        console.error('ERROR: Envelope or invitation element not found!');
+        if (!envelope) console.error('Envelope element is null');
+        if (!invitation) console.error('Invitation element is null');
     }
 
     // Music Toggle Control (only if elements exist)
@@ -112,35 +133,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    console.log('Script initialization complete');
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
