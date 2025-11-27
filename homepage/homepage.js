@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // Music Control - Works on both PC and Mobile
+    // Music Control with Resume Button
     var bgMusic = document.getElementById('bgMusic');
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
@@ -92,6 +92,40 @@ document.addEventListener('DOMContentLoaded', function () {
         
         console.log('Music state:', { musicState, savedTime, hasInteracted });
 
+        // Create resume button
+        var resumeBtn = document.createElement('div');
+        resumeBtn.id = 'musicResumeBtn';
+        resumeBtn.innerHTML = '🎵 Tap to Continue Music';
+        resumeBtn.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #5C0A0A, #3D0707);
+            color: #F8F4F0;
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            display: none;
+            animation: pulse 2s infinite;
+        `;
+
+        // Add pulse animation
+        var style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); }
+                50% { transform: translate(-50%, -50%) scale(1.05); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.body.appendChild(resumeBtn);
+
         // Set saved time when metadata loads
         if (savedTime > 0) {
             bgMusic.addEventListener('loadedmetadata', function() {
@@ -102,23 +136,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Function to start music
         function startMusic() {
-            console.log('Attempting to start music');
+            console.log('Starting music');
             bgMusic.play().then(function() {
                 console.log('✓ Music playing');
                 sessionStorage.setItem('musicPlaying', 'true');
+                resumeBtn.style.display = 'none';
                 if (musicIcon && musicToggle) {
                     musicIcon.textContent = '🔊';
                     musicToggle.classList.remove('muted');
                 }
             }).catch(function(error) {
                 console.log('✗ Music blocked:', error.message);
+                // Show button if autoplay fails
+                if (musicState === 'true' && hasInteracted) {
+                    resumeBtn.style.display = 'block';
+                }
             });
         }
 
-        // Try to auto-start (works on PC, blocked on mobile)
+        // Try to auto-start (works on PC)
         if (musicState === 'true' && hasInteracted) {
-            setTimeout(startMusic, 300);
+            setTimeout(function() {
+                startMusic();
+            }, 300);
         }
+
+        // Show button after a delay if music isn't playing
+        if (musicState === 'true' && hasInteracted) {
+            setTimeout(function() {
+                if (bgMusic.paused) {
+                    console.log('Music not playing - showing resume button');
+                    resumeBtn.style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        // Resume button click
+        resumeBtn.addEventListener('click', function() {
+            console.log('Resume button clicked');
+            startMusic();
+        });
 
         // Save time periodically
         setInterval(function () {
@@ -126,21 +183,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 sessionStorage.setItem('musicTime', bgMusic.currentTime);
             }
         }, 1000);
-
-        // CRITICAL FOR MOBILE: Resume music on ANY user interaction
-        var musicResumed = false;
-        function resumeMusic() {
-            if (!musicResumed && musicState === 'true' && hasInteracted && bgMusic.paused) {
-                musicResumed = true;
-                console.log('User touched screen - resuming music');
-                startMusic();
-            }
-        }
-
-        // Listen for ANY touch/click to resume music
-        document.addEventListener('touchstart', resumeMusic, { once: true, passive: true });
-        document.addEventListener('touchend', resumeMusic, { once: true, passive: true });
-        document.addEventListener('click', resumeMusic, { once: true });
 
         // Toggle button
         if (musicToggle) {
@@ -152,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     bgMusic.pause();
                     sessionStorage.setItem('musicPlaying', 'false');
+                    resumeBtn.style.display = 'none';
                     console.log('Music paused by user');
                     if (musicIcon) {
                         musicIcon.textContent = '🔇';
@@ -160,11 +203,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-    } else {
-        console.error('bgMusic element not found!');
     }
 
     console.log('Homepage initialization complete');
 });
-
 
