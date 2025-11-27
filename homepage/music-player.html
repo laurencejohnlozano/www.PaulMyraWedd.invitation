@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -11,51 +11,28 @@
 
     <script>
         var bgMusic = document.getElementById('bgMusic');
+        var hasStarted = false;
 
         // Get saved music state and time
-        var musicState = localStorage.getItem('musicPlaying');
+        var musicState = sessionStorage.getItem('musicPlaying');
         var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
 
         // Set the saved time
         bgMusic.currentTime = savedTime;
 
-        // Auto play if it was playing before
-        if (musicState !== 'false') {
-            bgMusic.play().catch(function () {
-                // Autoplay blocked
-            });
+        // Function to start music
+        function startMusic() {
+            if (!hasStarted) {
+                bgMusic.play().then(function() {
+                    hasStarted = true;
+                    sessionStorage.setItem('musicPlaying', 'true');
+                    console.log('Music started successfully');
+                }).catch(function(error) {
+                    console.log('Autoplay prevented:', error);
+                });
+            } else if (musicState !== 'false') {
+                bgMusic.play().catch(function(error) {
+                    console.log('Play prevented:', error);
+                });
+            }
         }
-
-        // Save time every second
-        setInterval(function () {
-            if (!bgMusic.paused) {
-                sessionStorage.setItem('musicTime', bgMusic.currentTime);
-            }
-        }, 1000);
-
-        // Listen for commands from parent pages
-        window.addEventListener('message', function (event) {
-            if (event.data === 'toggleMusic') {
-                if (bgMusic.paused) {
-                    bgMusic.play();
-                    localStorage.setItem('musicPlaying', 'true');
-                    event.source.postMessage({ musicPlaying: true }, '*');
-                } else {
-                    bgMusic.pause();
-                    localStorage.setItem('musicPlaying', 'false');
-                    event.source.postMessage({ musicPlaying: false }, '*');
-                }
-            } else if (event.data === 'getMusicState') {
-                event.source.postMessage({
-                    musicPlaying: !bgMusic.paused
-                }, '*');
-            }
-        });
-
-        // Save time before page unload
-        window.addEventListener('beforeunload', function () {
-            sessionStorage.setItem('musicTime', bgMusic.currentTime);
-        });
-    </script>
-</body>
-</html>
