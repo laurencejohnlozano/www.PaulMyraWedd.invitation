@@ -1,4 +1,4 @@
-﻿/* Page Transition Animation */
+/* Page Transition Animation */
 body {
     animation: fadeIn 0.6s ease-in;
 }
@@ -142,6 +142,9 @@ body {
     height: 220px;
     cursor: pointer;
     transition: transform 0.3s ease;
+    touch-action: manipulation; /* Better touch handling on mobile */
+    user-select: none; /* Prevent text selection on tap */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
 }
 
     .envelope:hover {
@@ -220,6 +223,7 @@ body {
     box-shadow: 0 4px 15px rgba(92, 10, 10, 0.4);
     z-index: 30;
     transition: opacity 0.3s ease;
+    pointer-events: none; /* Allow clicks to pass through */
 }
 
 .envelope.open .wax-seal {
@@ -244,6 +248,7 @@ body {
     animation: pulse 2s infinite;
     font-family: 'Playfair Display', serif;
     font-style: italic;
+    pointer-events: none; /* Don't block clicks */
 }
 
 .envelope.open .tap-hint {
