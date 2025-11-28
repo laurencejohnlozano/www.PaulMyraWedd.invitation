@@ -14,114 +14,46 @@
         body {
             background: transparent;
             font-family: 'Playfair Display', serif;
+            pointer-events: none;
         }
         
         .music-player {
             position: fixed;
-            bottom: 20px;
+            bottom: 100px;
             right: 20px;
             background: linear-gradient(135deg, #5C0A0A, #3D0707);
-            border-radius: 50px;
-            padding: 12px 20px;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             border: 2px solid rgba(248, 244, 240, 0.3);
             z-index: 99999;
             transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto;
         }
         
         .music-player:hover {
-            transform: translateY(-2px);
+            transform: scale(1.1);
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
         }
         
+        .music-player:active {
+            transform: scale(0.95);
+        }
+        
         .play-btn {
-            background: rgba(248, 244, 240, 0.2);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .play-btn:hover {
-            background: rgba(248, 244, 240, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .music-info {
-            color: #F8F4F0;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        
-        .song-title {
-            font-size: 14px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        
-        .time-display {
-            font-size: 11px;
-            opacity: 0.8;
-            font-family: 'Arial', sans-serif;
-        }
-        
-        .progress-bar {
-            width: 120px;
-            height: 4px;
-            background: rgba(248, 244, 240, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #F8F4F0;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-        
-        /* Mobile: Show compact version */
-        @media (max-width: 768px) {
-            .music-player {
-                bottom: 80px;
-                padding: 0;
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                justify-content: center;
-            }
-            
-            .music-info {
-                display: none;
-            }
-            
-            .play-btn {
-                background: transparent;
-            }
+            font-size: 24px;
+            user-select: none;
         }
     </style>
 </head>
 <body>
-    <div class="music-player">
-        <button class="play-btn" id="playBtn">▶️</button>
-        <div class="music-info">
-            <div class="song-title">Wedding Music</div>
-            <div class="progress-bar" id="progressBar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
-        </div>
+    <div class="music-player" id="musicPlayer">
+        <div class="play-btn" id="playBtn">▶️</div>
     </div>
     
     <audio id="bgMusic" loop>
@@ -131,30 +63,34 @@
     <script>
         const bgMusic = document.getElementById('bgMusic');
         const playBtn = document.getElementById('playBtn');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const timeDisplay = document.getElementById('timeDisplay');
+        const musicPlayer = document.getElementById('musicPlayer');
         
         // Load saved state
         const wasPlaying = localStorage.getItem('musicPlaying') === 'true';
         const savedTime = parseFloat(localStorage.getItem('musicTime') || '0');
         
+        // Restore time when metadata loads
         bgMusic.addEventListener('loadedmetadata', function() {
             if (savedTime > 0) {
                 bgMusic.currentTime = savedTime;
             }
-            updateTimeDisplay();
         });
         
+        // Auto-play if was playing (will work on desktop, fail gracefully on mobile)
         if (wasPlaying) {
             setTimeout(function() {
                 bgMusic.play().then(function() {
                     updatePlayButton();
-                }).catch(function() {});
+                }).catch(function() {
+                    // Autoplay blocked, user needs to click
+                    updatePlayButton();
+                });
             }, 300);
         }
         
-        playBtn.addEventListener('click', function() {
+        // Click handler
+        musicPlayer.addEventListener('click', function(e) {
+            e.stopPropagation();
             if (bgMusic.paused) {
                 bgMusic.play();
                 localStorage.setItem('musicPlaying', 'true');
@@ -165,41 +101,20 @@
             updatePlayButton();
         });
         
-        progressBar.addEventListener('click', function(e) {
-            const rect = progressBar.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
-            bgMusic.currentTime = percent * bgMusic.duration;
-        });
-        
+        // Update button icon
         function updatePlayButton() {
             playBtn.textContent = bgMusic.paused ? '▶️' : '⏸️';
         }
         
-        function updateProgress() {
-            const percent = (bgMusic.currentTime / bgMusic.duration) * 100;
-            progressFill.style.width = percent + '%';
-        }
-        
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return mins + ':' + (secs < 10 ? '0' : '') + secs;
-        }
-        
-        function updateTimeDisplay() {
-            const current = formatTime(bgMusic.currentTime);
-            const total = formatTime(bgMusic.duration || 0);
-            timeDisplay.textContent = current + ' / ' + total;
-        }
-        
+        // Save time every second
         bgMusic.addEventListener('timeupdate', function() {
-            updateProgress();
-            updateTimeDisplay();
             localStorage.setItem('musicTime', bgMusic.currentTime);
         });
         
         bgMusic.addEventListener('play', updatePlayButton);
         bgMusic.addEventListener('pause', updatePlayButton);
+        
+        updatePlayButton();
     </script>
 </body>
 </html>
