@@ -3,39 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Myra and Paul Wedding</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <title>Paul & Myra Wedding Invitation</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Invitation Card -->
-        <div class="invitation" id="invitation">
-            <div class="invitation-inner">
-                <p class="invitation-subtitle">You are Invited to Celebrate</p>
-                <h2 class="invitation-names">Paul and Myra</h2>
-                <p class="invitation-text">are getting married!</p>
-                <div class="invitation-divider"></div>
-                <p class="invitation-date">January 16, 2026</p>
-                <p class="invitation-hint">Tap to continue</p>
-            </div>
-        </div>
 
-        <!-- Envelope -->
-        <div class="envelope" id="envelope">
-            <div class="envelope-body">
-                <div class="envelope-inner-border"></div>
-            </div>
-            <div class="envelope-bottom"></div>
-            <div class="envelope-flap"></div>
-            <div class="wax-seal"><span>P&#9829;M</span></div>
-            <p class="tap-hint">Tap to open</p>
+<!-- ░░░ ENVELOPE STAGE (same as your original) ░░░ -->
+<div class="container" id="envelope-stage">
+    <div class="invitation" id="invitation">
+        <div class="invitation-inner">
+            <p class="invitation-subtitle">You are Invited to Celebrate</p>
+            <h2 class="invitation-names">Paul and Myra</h2>
+            <p class="invitation-text">are getting married!</p>
+            <div class="invitation-divider"></div>
+            <p class="invitation-date">January 16, 2026</p>
+            <p class="invitation-hint">Tap to continue</p>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div class="envelope" id="envelope">
+        <div class="envelope-body">
+            <div class="envelope-inner-border"></div>
+        </div>
+        <div class="envelope-bottom"></div>
+        <div class="envelope-flap"></div>
+        <div class="wax-seal"><span>P♥M</span></div>
+        <p class="tap-hint">Tap to open</p>
+    </div>
+</div>
+
+<!-- ░░░ MAIN APP (hidden at first) ░░░ -->
+<div id="app" class="hidden">
+
+    <!-- GLOBAL MUSIC PLAYER (never reloads) -->
+    <iframe 
+        src="/www.PaulMyraWedd.invitation/music-player.html"
+        id="bgm-frame"
+        style="display:none;"
+        allow="autoplay">
+    </iframe>
+
+    <!-- BIG IFRAME (loads your actual website pages) -->
+    <iframe 
+        id="page-frame"
+        src="homepage/homepage.html"
+        style="width:100%; height:100vh; border:none; overflow:hidden;">
+    </iframe>
+
+</div>
+
+<!-- ░░░ SCRIPT FOR ENVELOPE + PAGE SWITCHING ░░░ -->
+<script>
+    const envelope = document.getElementById("envelope");
+    const invitation = document.getElementById("invitation");
+    const envelopeStage = document.getElementById("envelope-stage");
+    const app = document.getElementById("app");
+    const pageFrame = document.getElementById("page-frame");
+
+    let envelopeOpened = false;
+
+    // Open envelope
+    envelope.addEventListener("click", () => {
+        if (envelopeOpened) return;
+        envelopeOpened = true;
+
+        envelope.classList.add("open");
+        setTimeout(() => {
+            invitation.classList.add("show");
+        }, 500);
+    });
+
+    // Go to homepage inside iframe
+    invitation.addEventListener("click", () => {
+        if (!envelopeOpened) return;
+
+        envelopeStage.classList.add("hidden");
+        app.classList.remove("hidden");
+    });
+
+    // Listen for page changes from inside iframe
+    window.addEventListener("message", (e) => {
+        if (e.data?.navigate) {
+            pageFrame.src = e.data.navigate;
+        }
+    });
+</script>
+
 </body>
 </html>
+
 
 
 
