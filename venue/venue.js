@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (bgMusic) {
         var playBtn = document.createElement('div');
         playBtn.innerHTML = '🎵 Play Music';
-        playBtn.style.cssText = 'position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#5C0A0A,#3D0707);color:#F8F4F0;padding:10px 20px;border-radius:50px;font-family:Playfair Display,serif;font-size:14px;cursor:pointer;z-index:10000;box-shadow:0 4px 15px rgba(0,0,0,0.3)';
+        playBtn.style.cssText = 'position:fixed;bottom:30px;right:20px;background:linear-gradient(135deg,#5C0A0A,#3D0707);color:#F8F4F0;padding:15px 25px;border-radius:50px;font-family:Playfair Display,serif;font-size:16px;cursor:pointer;z-index:10000;box-shadow:0 4px 15px rgba(0,0,0,0.3)';
         document.body.appendChild(playBtn);
 
         // Check if music was playing before
@@ -77,9 +77,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (wasPlaying) {
             setTimeout(function() {
                 bgMusic.play().then(function() {
-                    playBtn.innerHTML = '⏸️ Pause';
+                    playBtn.innerHTML = '⏸️';
                 }).catch(function() {
-                    playBtn.innerHTML = '🎵 Play Music';
+                    playBtn.innerHTML = '🎵';
                 });
             }, 300);
         }
@@ -92,3 +92,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1000);
     }
 });
+
