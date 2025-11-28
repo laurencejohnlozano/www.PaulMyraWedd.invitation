@@ -24,17 +24,24 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
 // Fade in animation on scroll
 document.addEventListener('DOMContentLoaded', function () {
-    var timelineItems = document.querySelectorAll('.timeline-item');
-    var thankYouSection = document.querySelector('.thank-you-section');
+    var attireCards = document.querySelectorAll('.attire-card, .color-palette-section');
 
     var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
+        entries.forEach(function (entry, index) {
             if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'scale(1) translateY(0)';
+                setTimeout(function () {
+                    entry.target.style.opacity = '0';
+                    entry.target.style.transform = 'translateY(30px)';
+
+                    setTimeout(function () {
+                        entry.target.style.transition = 'all 0.8s ease';
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 150);
+
                 observer.unobserve(entry.target);
             }
         });
@@ -42,33 +49,10 @@ document.addEventListener('DOMContentLoaded', function () {
         threshold: 0.1
     });
 
-    timelineItems.forEach(function (item) {
-        observer.observe(item);
+    attireCards.forEach(function (card) {
+        observer.observe(card);
     });
-
-    if (thankYouSection) {
-        thankYouSection.style.opacity = '0';
-        thankYouSection.style.transform = 'translateY(30px)';
-        
-        var thankYouObserver = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    setTimeout(function () {
-                        entry.target.style.transition = 'all 0.8s ease';
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }, 100);
-                    thankYouObserver.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
-        
-        thankYouObserver.observe(thankYouSection);
-    }
 });
-
 // Music Toggle Control
 document.addEventListener('DOMContentLoaded', function () {
     var musicFrame = document.getElementById('musicFrame');
