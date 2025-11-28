@@ -1,57 +1,41 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Myra and Paul Wedding — Invitation</title>
-
-  <!-- keep your main styles -->
-  <link rel="stylesheet" href="styles.css">
-  <!-- page-specific CSS will be loaded dynamically -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Myra and Paul Wedding</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container" id="envelope-stage">
-    <!-- envelope + invitation (kept from your original index) -->
-    <div class="invitation" id="invitation">
-      <div class="invitation-inner">
-        <p class="invitation-subtitle">You are Invited to Celebrate</p>
-        <h2 class="invitation-names">Paul and Myra</h2>
-        <p class="invitation-text">are getting married!</p>
-        <div class="invitation-divider"></div>
-        <p class="invitation-date">January 16, 2026</p>
-        <p class="invitation-hint">Tap to continue</p>
-      </div>
+    <div class="container">
+        <!-- Invitation Card -->
+        <div class="invitation" id="invitation">
+            <div class="invitation-inner">
+                <p class="invitation-subtitle">You are Invited to Celebrate</p>
+                <h2 class="invitation-names">Paul and Myra</h2>
+                <p class="invitation-text">are getting married!</p>
+                <div class="invitation-divider"></div>
+                <p class="invitation-date">January 16, 2026</p>
+                <p class="invitation-hint">Tap to continue</p>
+            </div>
+        </div>
+
+        <!-- Envelope -->
+        <div class="envelope" id="envelope">
+            <div class="envelope-body">
+                <div class="envelope-inner-border"></div>
+            </div>
+            <div class="envelope-bottom"></div>
+            <div class="envelope-flap"></div>
+            <div class="wax-seal"><span>P&#9829;M</span></div>
+            <p class="tap-hint">Tap to open</p>
+        </div>
     </div>
 
-    <div class="envelope" id="envelope">
-      <div class="envelope-body">
-        <div class="envelope-inner-border"></div>
-      </div>
-      <div class="envelope-bottom"></div>
-      <div class="envelope-flap"></div>
-      <div class="wax-seal"><span>P&#9829;M</span></div>
-      <p class="tap-hint">Tap to open</p>
-    </div>
-  </div>
-
-  <!-- SPA content container (hidden until envelope opened) -->
-  <div id="spa-app" class="hidden">
-    <!-- global nav + content will be loaded into #spa-content -->
-    <div id="spa-content"></div>
-  </div>
-
-  <!-- global music iframe: keep this at root so it never reloads across SPA page loads -->
-  <iframe id="bgm-frame" src="music-player.html" style="display:none;" aria-hidden="true"></iframe>
-
-  <!-- Global music toggle (works across pages) -->
-  <div id="global-music-toggle" class="music-toggle" aria-label="Music toggle" title="Music">
-    <span id="global-music-icon" class="music-icon">🔇</span>
-  </div>
-
-  <!-- SPA loader and envelope script -->
-  <script src="script.js"></script>
-
-  <!-- Keep any original envelope script behavior? spa.js will handle envelope open. -->
+    <script src="script.js"></script>
 </body>
 </html>
+
+
 
