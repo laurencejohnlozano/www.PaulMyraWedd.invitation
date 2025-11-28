@@ -325,8 +325,8 @@ body {
     /* Bigger seal but SAME font size to keep letters inside */
     .wax-seal {
         top: 50px;
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
     }
 
     .wax-seal span {
@@ -414,3 +414,4 @@ body {
         font-size: 22px;
     }
 }
+
