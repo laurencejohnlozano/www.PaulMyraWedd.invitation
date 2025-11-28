@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (bgMusic && !bgMusic.paused) {
                 localStorage.setItem('musicTime', bgMusic.currentTime);
                 localStorage.setItem('musicPlaying', 'true');
+                console.log('Saved: time=' + bgMusic.currentTime + ', playing=true');
             }
             document.body.classList.add('fade-out');
             setTimeout(function () { window.location.href = href; }, 400);
@@ -51,17 +52,25 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCountdown();
     setInterval(updateCountdown, 1000);
     
-    // Homepage has TEXT button
     var bgMusic = document.getElementById('bgMusic');
     if (bgMusic) {
         var playBtn = document.createElement('div');
         playBtn.innerHTML = '🎵 Play Music';
-        playBtn.style.cssText = 'position:fixed;bottom:150px;right:20px;background:linear-gradient(135deg,#5C0A0A,#3D0707);color:#F8F4F0;padding:12px 20px;border-radius:25px;font-family:Playfair Display,serif;font-size:14px;cursor:pointer;z-index:9999;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:2px solid rgba(248,244,240,0.3);transition:transform 0.2s';
+        playBtn.style.cssText = 'position:fixed;bottom:80px;right:20px;background:linear-gradient(135deg,#5C0A0A,#3D0707);color:#F8F4F0;padding:12px 20px;border-radius:25px;font-family:Playfair Display,serif;font-size:14px;cursor:pointer;z-index:9999;box-shadow:0 4px 15px rgba(0,0,0,0.3);border:2px solid rgba(248,244,240,0.3)';
         document.body.appendChild(playBtn);
         
         var wasPlaying = localStorage.getItem('musicPlaying') === 'true';
         var savedTime = parseFloat(localStorage.getItem('musicTime') || '0');
-        if (wasPlaying && savedTime > 0) bgMusic.currentTime = savedTime;
+        
+        console.log('Homepage loaded: wasPlaying=' + wasPlaying + ', savedTime=' + savedTime);
+        
+        // Wait for audio to be ready before setting time
+        bgMusic.addEventListener('canplay', function() {
+            if (savedTime > 0 && bgMusic.currentTime === 0) {
+                bgMusic.currentTime = savedTime;
+                console.log('Time set to: ' + savedTime);
+            }
+        }, { once: true });
         
         playBtn.addEventListener('click', function() {
             if (bgMusic.paused) {
@@ -79,11 +88,17 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(function() { 
                 bgMusic.play().then(function() {
                     playBtn.innerHTML = '⏸️ Pause';
-                }).catch(function() {
-                    playBtn.innerHTML = '🎵 Play Music';
+                    console.log('Auto-playing from: ' + bgMusic.currentTime);
+                }).catch(function(e) {
+                    console.log('Auto-play blocked: ' + e.message);
                 });
-            }, 300);
+            }, 500);
         }
-        setInterval(function() { if (!bgMusic.paused) localStorage.setItem('musicTime', bgMusic.currentTime); }, 1000);
+        
+        setInterval(function() { 
+            if (!bgMusic.paused) {
+                localStorage.setItem('musicTime', bgMusic.currentTime);
+            }
+        }, 1000);
     }
 });
