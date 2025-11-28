@@ -64,10 +64,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
 
+    console.log('Venue: Music elements found:', { bgMusic: !!bgMusic, musicToggle: !!musicToggle, musicIcon: !!musicIcon });
+
     if (bgMusic) {
         var musicState = sessionStorage.getItem('musicPlaying');
         var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
         var hasInteracted = sessionStorage.getItem('hasInteracted') === 'true';
+
+        console.log('Venue: Music state from storage:', { musicState, savedTime, hasInteracted });
 
         // Create continue button
         var continueBtn = document.createElement('div');
@@ -89,43 +93,52 @@ document.addEventListener('DOMContentLoaded', function () {
             display: none;
         `;
         document.body.appendChild(continueBtn);
+        console.log('Venue: Continue button created');
 
         // Restore saved time
         if (savedTime > 0) {
             bgMusic.addEventListener('loadedmetadata', function() {
                 bgMusic.currentTime = savedTime;
+                console.log('Venue: Time restored to:', savedTime);
             }, { once: true });
         }
 
         // Function to start music
         function startMusic() {
+            console.log('Venue: startMusic called');
             bgMusic.play().then(function() {
+                console.log('Venue: Music playing');
                 sessionStorage.setItem('musicPlaying', 'true');
                 continueBtn.style.display = 'none';
                 if (musicIcon && musicToggle) {
                     musicIcon.textContent = '🔊';
                     musicToggle.classList.remove('muted');
                 }
-            }).catch(function() {
+            }).catch(function(err) {
+                console.log('Venue: Play blocked:', err.message);
                 continueBtn.style.display = 'block';
             });
         }
 
         // Continue button click
         continueBtn.addEventListener('click', function() {
+            console.log('Venue: Continue button clicked');
             startMusic();
         });
 
         // If music was playing, try to continue
         if (musicState === 'true' && hasInteracted) {
+            console.log('Venue: Attempting auto-continue');
             setTimeout(function() {
                 bgMusic.play().then(function() {
+                    console.log('Venue: Auto-continue successful');
                     continueBtn.style.display = 'none';
                     if (musicIcon && musicToggle) {
                         musicIcon.textContent = '🔊';
                         musicToggle.classList.remove('muted');
                     }
                 }).catch(function() {
+                    console.log('Venue: Auto-continue blocked, showing button');
                     continueBtn.style.display = 'block';
                 });
             }, 500);
@@ -155,5 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
+    } else {
+        console.log('Venue: bgMusic element NOT FOUND!');
     }
 });
