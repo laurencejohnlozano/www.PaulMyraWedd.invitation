@@ -1,15 +1,12 @@
-// spa.js - SPA loader and global controller
+// spa.js — SPA loader that keeps music playing (works with your existing folders)
 (function () {
-  // Utilities
-  function isLocalHtmlLink(href) {
-    if (!href) return false;
-    // treat links ending with .html as SPA fragments
-    return href.endsWith('.html') && !href.startsWith('http');
+  // small helpers
+  function isLocalHtml(href) {
+    return !!href && href.endsWith('.html') && !href.startsWith('http') && !href.startsWith('//');
   }
 
-  // Insert CSS link (avoid duplicate)
   const insertedCSS = new Set();
-  function insertCSSLink(href) {
+  function addCss(href) {
     if (!href || insertedCSS.has(href)) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
@@ -18,99 +15,74 @@
     insertedCSS.add(href);
   }
 
-  // Execute external scripts found in fetched document
   function runExternalScripts(doc) {
     const scripts = Array.from(doc.querySelectorAll('script[src]'));
     scripts.forEach(s => {
       const src = s.getAttribute('src');
-      // avoid duplicating same script twice (optional)
-      const existing = Array.from(document.scripts).some(el => el.src && el.src.endsWith(src));
-      if (!existing) {
-        const nx = document.createElement('script');
-        nx.src = src;
-        nx.defer = false;
-        document.body.appendChild(nx);
-      }
+      if (!src) return;
+      // avoid duplicate
+      if (Array.from(document.scripts).some(existing => existing.src && existing.src.endsWith(src))) return;
+      const sc = document.createElement('script');
+      sc.src = src;
+      document.body.appendChild(sc);
     });
   }
 
-  // Load fragment via fetch, parse, inject content, load CSS & JS
-  async function loadPage(path) {
+  async function loadFragment(path) {
+    const container = document.getElementById('spa-content');
+    if (!container) return;
+    document.body.classList.add('fade-out');
+    await new Promise(r => setTimeout(r, 250));
     try {
-      const container = document.getElementById('spa-content');
-      if (!container) return;
-
-      document.body.classList.add('fade-out');
-
-      // small delay to allow fade-out animation (keeps transition)
-      await new Promise(r => setTimeout(r, 300));
-
-      const res = await fetch(path, {cache: "no-store"});
-      if (!res.ok) {
-        container.innerHTML = `<p style="padding:40px; text-align:center;">Failed to load page: ${path}</p>`;
-        document.body.classList.remove('fade-out');
-        return;
-      }
+      const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) throw new Error('Failed to fetch ' + path);
       const text = await res.text();
-      // parse and extract head/body
       const parser = new DOMParser();
       const doc = parser.parseFromString(text, 'text/html');
-
-      // load CSS links present in the fragment head
-      const links = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
-      links.forEach(l => {
+      // load CSS references inside fragment (use folder-prefixed hrefs)
+      Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).forEach(l => {
         const href = l.getAttribute('href');
-        if (href) insertCSSLink(href);
+        if (href) addCss(href);
       });
-
-      // Remove any <audio> tags from content to prevent duplicates
+      // remove audio tags from fragment to avoid duplicates
       Array.from(doc.querySelectorAll('audio')).forEach(a => a.remove());
-
-      // Inject the body content
+      // inject innerHTML
       container.innerHTML = doc.body.innerHTML;
-
-      // Execute inline scripts
+      // run inline scripts immediately
       Array.from(doc.querySelectorAll('script:not([src])')).forEach(inline => {
-        try {
-          const code = inline.textContent || inline.innerText || '';
-          if (code.trim()) new Function(code)();
-        } catch (e) {
-          console.warn('Error running inline script', e);
+        const code = inline.textContent || inline.innerText || '';
+        if (code.trim()) {
+          try { new Function(code)(); } catch (e) { console.warn('inline script error', e); }
         }
       });
-
-      // Execute external scripts (by appending to document)
+      // then add external scripts
       runExternalScripts(doc);
-
-      // Re-wire links inside the loaded fragment to use SPA navigation
-      rewireInternalLinks(container);
-
-      // Remove fade-out
+      // rewire internal links in loaded fragment
+      rewireLinks(container);
+      // done transition
       document.body.classList.remove('fade-out');
-
-      // After loading page, ask music iframe for current state and update icon
-      requestMusicState();
-
-      // scroll to top
       window.scrollTo(0, 0);
+      // ask music iframe for state (so toggle icon is correct)
+      requestMusicState();
     } catch (err) {
-      console.error('loadPage error', err);
+      console.error(err);
+      container.innerHTML = '<p style="padding:36px;text-align:center">Could not load page.</p>';
+      document.body.classList.remove('fade-out');
     }
   }
 
-  // convert anchors that point to .html to use SPA load
-  function rewireInternalLinks(root) {
+  function rewireLinks(root) {
     const anchors = Array.from(root.querySelectorAll('a[href]'));
     anchors.forEach(a => {
       const href = a.getAttribute('href');
-      if (isLocalHtmlLink(href)) {
+      if (isLocalHtml(href)) {
         a.addEventListener('click', function (e) {
           e.preventDefault();
-          loadPage(href);
+          loadFragment(href);
         });
       } else {
-        // external links remain normal - open in new tab if target not set
-        if (!a.target && (href.startsWith('http') || href.startsWith('//'))) {
+        // external links open in new tab
+        if ((href.startsWith('http') || href.startsWith('//')) && !a.target) {
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
         }
@@ -118,12 +90,14 @@
     });
   }
 
-  // Envelope open logic (shows SPA area and loads homepage)
+  // Envelope logic (uses existing envelope elements in your original index layout)
   function initEnvelope() {
     const envelope = document.getElementById('envelope');
     const invitation = document.getElementById('invitation');
     const envelopeStage = document.getElementById('envelope-stage');
     const spaApp = document.getElementById('spa-app');
+
+    if (!envelope || !invitation || !envelopeStage || !spaApp) return;
 
     let isAnimating = false;
     let hasOpened = false;
@@ -133,7 +107,7 @@
         hasOpened = true;
         isAnimating = true;
         envelope.classList.add('open');
-        setTimeout(function () {
+        setTimeout(() => {
           invitation.classList.add('show');
           isAnimating = false;
         }, 600);
@@ -142,84 +116,67 @@
       e && e.stopPropagation();
     }
 
-    function goToHomepage(e) {
+    function revealSPA(e) {
       if (invitation.classList.contains('show') && !isAnimating) {
-        // hide envelope stage and show SPA
         envelopeStage.classList.add('hidden');
         spaApp.classList.remove('hidden');
-        // load homepage fragment (no URL change in Option 1)
-        loadPage('homepage/homepage.html');
+        // load homepage fragment (keep URL clean — Option 1)
+        loadFragment('homepage/homepage.html');
       }
       e && e.preventDefault();
       e && e.stopPropagation();
     }
 
-    if (envelope && invitation) {
-      envelope.addEventListener('click', openEnvelope, {passive: false});
-      envelope.addEventListener('touchend', openEnvelope, {passive: false});
-      invitation.addEventListener('click', goToHomepage, {passive: false});
-      invitation.addEventListener('touchend', goToHomepage, {passive: false});
-    }
+    envelope.addEventListener('click', openEnvelope, { passive: false });
+    envelope.addEventListener('touchend', openEnvelope, { passive: false });
+    invitation.addEventListener('click', revealSPA, { passive: false });
+    invitation.addEventListener('touchend', revealSPA, { passive: false });
   }
 
-  /* ---------------------------
-     Music iframe communication
-     --------------------------- */
+  /* Music iframe comms */
   const iframe = document.getElementById('bgm-frame');
   const musicIcon = document.getElementById('global-music-icon');
-  const musicToggleEl = document.getElementById('global-music-toggle');
+  const musicToggle = document.getElementById('global-music-toggle');
 
-  // Ask iframe for music state
   function requestMusicState() {
-    if (!iframe || !iframe.contentWindow) return;
-    iframe.contentWindow.postMessage('getMusicState', '*');
+    if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage('getMusicState', '*');
   }
 
-  // Toggle global music (send toggle command to iframe)
   function toggleMusic() {
-    if (!iframe || !iframe.contentWindow) return;
-    iframe.contentWindow.postMessage('toggleMusic', '*');
+    if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage('toggleMusic', '*');
   }
 
-  // Listen for messages from the music iframe
   window.addEventListener('message', function (ev) {
-    const data = ev.data;
-    // music iframe uses { musicPlaying: true/false } responses after toggle or getMusicState
-    if (data && typeof data === 'object' && 'musicPlaying' in data) {
-      const playing = !!data.musicPlaying;
-      musicIcon.textContent = playing ? '🔊' : '🔇';
+    const d = ev.data;
+    if (d && typeof d === 'object' && 'musicPlaying' in d) {
+      if (musicIcon) musicIcon.textContent = d.musicPlaying ? '🔊' : '🔇';
     }
   });
 
-  // set up the global toggle click handler
-  if (musicToggleEl) {
-    musicToggleEl.addEventListener('click', function (e) {
+  if (musicToggle) {
+    musicToggle.addEventListener('click', function (e) {
       e.preventDefault();
       toggleMusic();
     });
   }
 
-  // On dom ready
-  document.addEventListener('DOMContentLoaded', function () {
-    // envelope open behavior
-    initEnvelope();
-
-    // if user refreshes while SPA already shown, restore homepage
-    const spaApp = document.getElementById('spa-app');
-    if (!spaApp.classList.contains('hidden')) {
-      // attempt to load homepage
-      loadPage('homepage/homepage.html');
+  // intercept global clicks as safety net
+  document.addEventListener('click', function (ev) {
+    const a = ev.target.closest && ev.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (isLocalHtml(href)) {
+      ev.preventDefault();
+      loadFragment(href);
     }
+  });
 
-    // global capture: if anchor with .html clicked anywhere, intercept (safety net)
-    document.body.addEventListener('click', function (ev) {
-      const a = ev.target.closest && ev.target.closest('a[href]');
-      if (!a) return;
-      const href = a.getAttribute('href');
-      if (isLocalHtmlLink(href)) {
-        ev.preventDefault();
-        loadPage(href);
-      }
-    });
+  document.addEventListener('DOMContentLoaded', function () {
+    initEnvelope();
+    // if user refreshes and SPA area visible, load homepage
+    const spaApp = document.getElementById('spa-app');
+    if (spaApp && !spaApp.classList.contains('hidden')) {
+      loadFragment('homepage/homepage.html');
+    }
   });
 })();
