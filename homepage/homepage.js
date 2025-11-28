@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (bgMusic && !bgMusic.paused) {
                 sessionStorage.setItem('musicTime', bgMusic.currentTime);
                 sessionStorage.setItem('musicPlaying', 'true');
+                console.log('Saved music time:', bgMusic.currentTime);
             }
             
             document.body.classList.add('fade-out');
@@ -77,24 +78,31 @@ document.addEventListener('DOMContentLoaded', function () {
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // Music Control with Resume Button
+    // Music Control - Starts on Homepage
     var bgMusic = document.getElementById('bgMusic');
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
     
     if (bgMusic) {
-        // Get saved music state
+        console.log('Music element found');
+
+        // Check if coming from another page or first time on homepage
         var musicState = sessionStorage.getItem('musicPlaying');
         var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
-        var hasInteracted = sessionStorage.getItem('hasInteracted') === 'true';
+        var isFirstVisit = !sessionStorage.getItem('hasVisitedHomepage');
         
-        console.log('Music state:', { musicState, savedTime, hasInteracted });
+        console.log('Music state:', { musicState, savedTime, isFirstVisit });
 
-        // Create smaller resume button
-        var resumeBtn = document.createElement('div');
-        resumeBtn.id = 'musicResumeBtn';
-        resumeBtn.innerHTML = '🎵 Tap to Continue';
-        resumeBtn.style.cssText = `
+        // Mark that we've visited homepage
+        if (isFirstVisit) {
+            sessionStorage.setItem('hasVisitedHomepage', 'true');
+        }
+
+        // Create "Start Music" button for first-time visitors
+        var startBtn = document.createElement('div');
+        startBtn.id = 'musicStartBtn';
+        startBtn.innerHTML = '🎵 Play Music';
+        startBtn.style.cssText = `
             position: fixed;
             bottom: 100px;
             left: 50%;
@@ -110,75 +118,59 @@ document.addEventListener('DOMContentLoaded', function () {
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: none;
         `;
+        document.body.appendChild(startBtn);
 
-        document.body.appendChild(resumeBtn);
-
-        // CRITICAL: Set saved time BEFORE attempting to play
-        var timeSet = false;
-        if (savedTime > 0) {
-            // Try to set time immediately if metadata is loaded
-            if (bgMusic.readyState >= 2) {
-                bgMusic.currentTime = savedTime;
-                timeSet = true;
-                console.log('Set time immediately to:', savedTime);
-            } else {
-                // Wait for metadata to load
-                bgMusic.addEventListener('loadedmetadata', function() {
-                    bgMusic.currentTime = savedTime;
-                    timeSet = true;
-                    console.log('Set time after metadata load to:', savedTime);
-                }, { once: true });
-            }
+        // Show button on first visit
+        if (isFirstVisit) {
+            startBtn.style.display = 'block';
+            console.log('First visit - showing start button');
         }
 
         // Function to start music
         function startMusic() {
-            console.log('Starting music at time:', bgMusic.currentTime);
-            
-            // Make sure time is set before playing
-            if (savedTime > 0 && !timeSet) {
-                bgMusic.currentTime = savedTime;
-            }
-            
+            console.log('Starting music');
             bgMusic.play().then(function() {
-                console.log('✓ Music playing from:', bgMusic.currentTime);
+                console.log('✓ Music playing');
                 sessionStorage.setItem('musicPlaying', 'true');
-                resumeBtn.style.display = 'none';
+                sessionStorage.setItem('hasInteracted', 'true');
+                startBtn.style.display = 'none';
                 if (musicIcon && musicToggle) {
                     musicIcon.textContent = '🔊';
                     musicToggle.classList.remove('muted');
                 }
             }).catch(function(error) {
                 console.log('✗ Play blocked:', error.message);
-                resumeBtn.style.display = 'block';
             });
         }
 
-        // Show button if music should be playing
-        if (musicState === 'true' && hasInteracted) {
-            resumeBtn.style.display = 'block';
-        }
-
-        // Resume button click
-        resumeBtn.addEventListener('click', function() {
-            console.log('Resume button clicked');
+        // Start button click
+        startBtn.addEventListener('click', function() {
+            console.log('Start button clicked');
             startMusic();
         });
 
-        // Try auto-start (works on PC only)
-        if (musicState === 'true' && hasInteracted) {
-            // Wait a bit for metadata to load
+        // If returning from another page, try to continue music
+        if (!isFirstVisit && musicState === 'true') {
+            // Set saved time if exists
+            if (savedTime > 0) {
+                bgMusic.addEventListener('loadedmetadata', function() {
+                    bgMusic.currentTime = savedTime;
+                    console.log('Restored time to:', savedTime);
+                }, { once: true });
+            }
+
+            // Try autoplay (works on PC)
             setTimeout(function() {
                 bgMusic.play().then(function() {
-                    console.log('✓ Auto-start successful');
-                    resumeBtn.style.display = 'none';
-                    sessionStorage.setItem('musicPlaying', 'true');
+                    console.log('✓ Continued music automatically');
                     if (musicIcon && musicToggle) {
                         musicIcon.textContent = '🔊';
                         musicToggle.classList.remove('muted');
                     }
-                }).catch(function(error) {
-                    console.log('✗ Auto-start blocked - showing button');
+                }).catch(function() {
+                    console.log('✗ Autoplay blocked - showing button');
+                    startBtn.innerHTML = '🎵 Continue Music';
+                    startBtn.style.display = 'block';
                 });
             }, 500);
         }
@@ -195,12 +187,11 @@ document.addEventListener('DOMContentLoaded', function () {
             musicToggle.addEventListener('click', function (e) {
                 e.stopPropagation();
                 if (bgMusic.paused) {
-                    sessionStorage.setItem('hasInteracted', 'true');
                     startMusic();
                 } else {
                     bgMusic.pause();
                     sessionStorage.setItem('musicPlaying', 'false');
-                    resumeBtn.style.display = 'none';
+                    console.log('Music paused');
                     if (musicIcon) {
                         musicIcon.textContent = '🔇';
                         musicToggle.classList.add('muted');
@@ -212,3 +203,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Homepage initialization complete');
 });
+
