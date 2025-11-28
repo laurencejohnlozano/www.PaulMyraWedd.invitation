@@ -1,11 +1,21 @@
 // ═══════════════════════════════════════════════════════════════
-// UNIVERSAL MUSIC PLAYER - Add this to ALL pages
+// MUSIC PLAYER - PC/DESKTOP ONLY
 // ═══════════════════════════════════════════════════════════════
 
 (function() {
     'use strict';
     
-    // Create audio element (only one instance needed)
+    // Detect mobile - EXIT if mobile
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        console.log('Mobile detected - music player disabled');
+        return; // Don't create anything on mobile
+    }
+    
+    // ════════ DESKTOP ONLY CODE ════════
+    
+    // Create audio element
     var audio = document.createElement('audio');
     audio.id = 'globalMusic';
     audio.loop = true;
@@ -54,7 +64,7 @@
         }
     });
     
-    // Hover effect
+    // Hover effects
     playerBtn.addEventListener('mouseenter', function() {
         this.style.transform = 'scale(1.1)';
     });
@@ -63,7 +73,6 @@
         this.style.transform = 'scale(1)';
     });
     
-    // Active effect
     playerBtn.addEventListener('mousedown', function() {
         this.style.transform = 'scale(0.95)';
     });
@@ -72,15 +81,17 @@
         this.style.transform = 'scale(1.1)';
     });
     
-    // Auto-resume if was playing
+    // AUTO-CONTINUE on page navigation
     if (savedPlaying) {
         setTimeout(function() {
             audio.play().then(function() {
                 updateButton();
+                console.log('Desktop: Auto-continuing music');
             }).catch(function() {
                 updateButton();
+                console.log('Desktop: Auto-continue blocked (click to play)');
             });
-        }, 500);
+        }, 300);
     }
     
     // Save time continuously
@@ -93,5 +104,7 @@
     audio.addEventListener('pause', updateButton);
     
     updateButton();
+    
+    console.log('Desktop detected - music player enabled');
     
 })();
