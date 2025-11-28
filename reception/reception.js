@@ -158,6 +158,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
-});
-});
+};
+
 
