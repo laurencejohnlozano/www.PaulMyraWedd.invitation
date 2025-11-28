@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Music Player</title>
+</head>
+<body>
+  <audio id="bgMusic" loop preload="auto">
+    <source src="homepage/wedding-music.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    var bgMusic = document.getElementById('bgMusic');
+    var playAttempts = 0;
+
+    // Use sessionStorage to persist state between SPA loads in same tab
+    var musicState = sessionStorage.getItem('musicPlaying');
+    var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
+
+    if (savedTime > 0) {
+      try { bgMusic.currentTime = savedTime; } catch (e) { /* ignore */ }
+    }
+
+    function startMusic() {
+      playAttempts++;
+      if (musicState === 'false' && playAttempts === 1) return;
+      bgMusic.play().then(function() {
+        sessionStorage.setItem('musicPlaying', 'true');
+        // notify parent
+        parent.postMessage({ musicPlaying: true }, '*');
+      }).catch(function(err) {
+        // autoplay blocked — wait for user
+        parent.postMessage({ musicPlaying: !bgMusic.paused }, '*');
+      });
+    }
+
+    // Try muted autoplay trick if it was playing
+    if (sessionStorage.getItem('musicPlaying') === 'true') {
+      bgMusic.muted = true;
+      bgMusic.play().then(function() {
+        // unmute shortly after
+        setTimeout(function() {
+          bgMusic.muted = false;
+          parent.postMessage({ musicPlaying: !bgMusic.paused }, '*');
+        }, 150);
+      }).catch(function() {
+        parent.postMessage({ musicPlaying: !bgMusic.paused }, '*');
+      });
+    } else {
+      parent.postMessage({ musicPlaying: !bgMusic.paused }, '*');
+    }
+
+    // Save time every second if playing
+    setInterval(function() {
+      if (!bgMusic.paused) {
+        sessionStorage.setItem('musicTime', bgMusic.currentTime);
+        sessionStorage.setItem('musicPlaying', 'true');
+      }
+    }, 1000);
+
+    // Listen to messages from parent
+    window.addEventListener('message', function (ev) {
+      var data = ev.data;
+      if (data === 'toggleMusic') {
+        if (bgMusic.paused) {
+          bgMusic.play().then(function() {
+            sessionStorage.setItem('musicPlaying', 'true');
+            parent.postMessage({ musicPlaying: true }, '*');
+          }).catch(function(e) {
+            parent.postMessage({ musicPlaying: false }, '*');
+          });
+        } else {
+          bgMusic.pause();
+          sessionStorage.setItem('musicPlaying', 'false');
+          parent.postMessage({ musicPlaying: false }, '*');
+        }
+      } else if (data === 'getMusicState') {
+        parent.postMessage({ musicPlaying: !bgMusic.paused }, '*');
+      } else if (data === 'startMusic') {
+        bgMusic.play().then(function() {
+          sessionStorage.setItem('musicPlaying', 'true');
+          parent.postMessage({ musicPlaying: true }, '*');
+        }).catch(function() {
+          parent.postMessage({ musicPlaying: false }, '*');
+        });
+      }
+    }, false);
+
+    // When page unloads, persist current time
+    window.addEventListener('beforeunload', function () {
+      if (!bgMusic.paused) {
+        sessionStorage.setItem('musicTime', bgMusic.currentTime);
+        sessionStorage.setItem('musicPlaying', 'true');
+      }
+    });
+
+    // Try to auto-play on first user interaction
+    var interactions = ['touchstart', 'touchend', 'click'];
+    interactions.forEach(function(evt) {
+      document.addEventListener(evt, function handler() {
+        if (bgMusic.paused && sessionStorage.getItem('musicPlaying') !== 'false') {
+          bgMusic.play().catch(function(){});
+        }
+        document.removeEventListener(evt, handler);
+      }, {passive:true});
+    });
+  </script>
+</body>
+</html>
