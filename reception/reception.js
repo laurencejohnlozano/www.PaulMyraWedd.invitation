@@ -34,21 +34,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Fade in animation on scroll
 document.addEventListener('DOMContentLoaded', function () {
-    var attireCards = document.querySelectorAll('.attire-card, .color-palette-section');
+    var galleryItems = document.querySelectorAll('.gallery-item');
 
     var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry, index) {
+        entries.forEach(function (entry) {
             if (entry.isIntersecting) {
-                setTimeout(function () {
-                    entry.target.style.opacity = '0';
-                    entry.target.style.transform = 'translateY(30px)';
+                entry.target.style.opacity = '0';
+                entry.target.style.transform = 'translateY(30px)';
 
-                    setTimeout(function () {
-                        entry.target.style.transition = 'all 0.8s ease';
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }, 100);
-                }, index * 150);
+                setTimeout(function () {
+                    entry.target.style.transition = 'all 0.8s ease';
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, 100);
 
                 observer.unobserve(entry.target);
             }
@@ -57,8 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
         threshold: 0.1
     });
 
-    attireCards.forEach(function (card) {
-        observer.observe(card);
+    galleryItems.forEach(function (item) {
+        observer.observe(item);
     });
 
     // Music Control - Continue from Homepage
@@ -158,6 +156,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
-};
+});
 
 
