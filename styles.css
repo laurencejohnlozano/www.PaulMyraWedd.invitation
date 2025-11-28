@@ -128,7 +128,7 @@ body {
 
 .invitation-hint {
     color: #D4A29C;
-    font-size: 12px;
+    font-size: 20px;
     margin-top: 16px;
     opacity: 0.7;
     font-family: 'Playfair Display', serif;
@@ -244,7 +244,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     color: #8B4513;
-    font-size: 14px;
+    font-size: 24px;
     animation: pulse 2s infinite;
     font-family: 'Playfair Display', serif;
     font-style: italic;
@@ -323,12 +323,12 @@ body {
 
     .wax-seal {
         top: 50px;
-        width: 50px;
-        height: 50px;
+        width: 80px;
+        height: 80px;
     }
 
         .wax-seal span {
-            font-size: 14px;
+            font-size: 24px;
         }
 
     .invitation {
@@ -358,15 +358,15 @@ body {
     }
 
     .invitation-text {
-        font-size: 14px;
+        font-size: 24px;
     }
 
     .invitation-date {
-        font-size: 14px;
+        font-size: 24px;
     }
 
     .tap-hint {
-        font-size: 12px;
+        font-size: 20px;
         bottom: -35px;
     }
 }
@@ -387,12 +387,12 @@ body {
 
     .wax-seal {
         top: 45px;
-        width: 45px;
-        height: 45px;
+        width: 70px;
+        height: 70px;
     }
 
         .wax-seal span {
-            font-size: 12px;
+            font-size: 20px;
         }
 
     .invitation {
