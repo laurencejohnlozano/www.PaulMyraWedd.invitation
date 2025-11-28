@@ -1,4 +1,4 @@
-// Smooth Page Transition
+/// Smooth Page Transition
 document.addEventListener('DOMContentLoaded', function () {
     // Intercept all navigation links
     var links = document.querySelectorAll('a[href$=".html"]');
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 sessionStorage.setItem('musicPlaying', 'true');
             }
 
-            // Add fade-out animation
+            // Add fade-out animation (ensure your CSS has .fade-out class)
             document.body.classList.add('fade-out');
 
             // Navigate after animation
@@ -32,10 +32,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Fade in animation on scroll
+// Music Control & Animations
 document.addEventListener('DOMContentLoaded', function () {
+    
+    // --- 1. Gallery Animation (From Venue) ---
     var galleryItems = document.querySelectorAll('.gallery-item');
-
     var observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
             if (entry.isIntersecting) {
@@ -51,107 +52,82 @@ document.addEventListener('DOMContentLoaded', function () {
                 observer.unobserve(entry.target);
             }
         });
-    }, {
-        threshold: 0.1
-    });
+    }, { threshold: 0.1 });
 
     galleryItems.forEach(function (item) {
         observer.observe(item);
     });
 
-    // Music Control - Continue from Homepage
+    // --- 2. Music Logic (Copied from Venue) ---
     var bgMusic = document.getElementById('bgMusic');
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
-
-    console.log('Venue: Music elements found:', { bgMusic: !!bgMusic, musicToggle: !!musicToggle, musicIcon: !!musicIcon });
 
     if (bgMusic) {
         var musicState = sessionStorage.getItem('musicPlaying');
         var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
         var hasInteracted = sessionStorage.getItem('hasInteracted') === 'true';
 
-        console.log('Venue: Music state from storage:', { musicState, savedTime, hasInteracted });
-
-        // Create continue button
+        // Create continue button for autoplay blocks
         var continueBtn = document.createElement('div');
         continueBtn.innerHTML = '🎵 Continue Music';
         continueBtn.style.cssText = `
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #5C0A0A, #3D0707);
-            color: #F8F4F0;
-            padding: 12px 25px;
-            border-radius: 30px;
-            font-family: 'Playfair Display', serif;
-            font-size: 14px;
-            cursor: pointer;
-            z-index: 10000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            display: none;
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: linear-gradient(135deg, #5C0A0A, #3D0707); color: #F8F4F0;
+            padding: 12px 25px; border-radius: 30px; font-family: 'Playfair Display', serif;
+            font-size: 14px; cursor: pointer; z-index: 10000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: none;
         `;
         document.body.appendChild(continueBtn);
-        console.log('Venue: Continue button created');
 
         // Restore saved time
         if (savedTime > 0) {
             bgMusic.addEventListener('loadedmetadata', function() {
                 bgMusic.currentTime = savedTime;
-                console.log('Venue: Time restored to:', savedTime);
             }, { once: true });
         }
 
-        // Function to start music
         function startMusic() {
-            console.log('Venue: startMusic called');
             bgMusic.play().then(function() {
-                console.log('Venue: Music playing');
                 sessionStorage.setItem('musicPlaying', 'true');
                 continueBtn.style.display = 'none';
                 if (musicIcon && musicToggle) {
                     musicIcon.textContent = '🔊';
                     musicToggle.classList.remove('muted');
                 }
-            }).catch(function(err) {
-                console.log('Venue: Play blocked:', err.message);
+            }).catch(function() {
                 continueBtn.style.display = 'block';
             });
         }
 
         // Continue button click
         continueBtn.addEventListener('click', function() {
-            console.log('Venue: Continue button clicked');
             startMusic();
         });
 
-        // If music was playing, try to continue
-        if (musicState === 'true' && hasInteracted) {
-            console.log('Venue: Attempting auto-continue');
+        // Try auto-continue if it was playing previously
+        if (musicState === 'true') {
             setTimeout(function() {
                 bgMusic.play().then(function() {
-                    console.log('Venue: Auto-continue successful');
                     continueBtn.style.display = 'none';
                     if (musicIcon && musicToggle) {
                         musicIcon.textContent = '🔊';
                         musicToggle.classList.remove('muted');
                     }
                 }).catch(function() {
-                    console.log('Venue: Auto-continue blocked, showing button');
                     continueBtn.style.display = 'block';
                 });
             }, 500);
         }
 
-        // Save time periodically
+        // Save time constantly
         setInterval(function () {
             if (!bgMusic.paused) {
                 sessionStorage.setItem('musicTime', bgMusic.currentTime);
             }
         }, 1000);
 
-        // Toggle button
+        // Toggle Button Click
         if (musicToggle) {
             musicToggle.addEventListener('click', function (e) {
                 e.stopPropagation();
@@ -168,7 +144,5 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-    } else {
-        console.log('Venue: bgMusic element NOT FOUND!');
     }
 });
