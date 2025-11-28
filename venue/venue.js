@@ -1,4 +1,4 @@
-/// Smooth Page Transition
+// Smooth Page Transition
 document.addEventListener('DOMContentLoaded', function () {
     // Intercept all navigation links
     var links = document.querySelectorAll('a[href$=".html"]');
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 sessionStorage.setItem('musicPlaying', 'true');
             }
 
-            // Add fade-out animation (ensure your CSS has .fade-out class)
+            // Add fade-out animation
             document.body.classList.add('fade-out');
 
             // Navigate after animation
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Music Control & Animations
 document.addEventListener('DOMContentLoaded', function () {
     
-    // --- 1. Gallery Animation (From Venue) ---
+    // --- 1. Gallery Animation ---
     var galleryItems = document.querySelectorAll('.gallery-item');
     var observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(item);
     });
 
-    // --- 2. Music Logic (Copied from Venue) ---
+    // --- 2. Music Logic ---
     var bgMusic = document.getElementById('bgMusic');
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
@@ -66,9 +66,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (bgMusic) {
         var musicState = sessionStorage.getItem('musicPlaying');
         var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
-        var hasInteracted = sessionStorage.getItem('hasInteracted') === 'true';
 
-        // Create continue button for autoplay blocks
+        // Create continue button
         var continueBtn = document.createElement('div');
         continueBtn.innerHTML = '🎵 Continue Music';
         continueBtn.style.cssText = `
@@ -90,6 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
         function startMusic() {
             bgMusic.play().then(function() {
                 sessionStorage.setItem('musicPlaying', 'true');
+                sessionStorage.setItem('hasInteracted', 'true');
                 continueBtn.style.display = 'none';
                 if (musicIcon && musicToggle) {
                     musicIcon.textContent = '🔊';
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
             startMusic();
         });
 
-        // Try auto-continue if it was playing previously
+        // Try auto-continue if music was playing
         if (musicState === 'true') {
             setTimeout(function() {
                 bgMusic.play().then(function() {
