@@ -1,77 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Home — Paul & Myra</title>
-  <!-- page CSS will be loaded by SPA (homepage.css) -->
-  <link rel="stylesheet" href="homepage/homepage.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Myra and Paul Wedding</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="homepage.css">
 </head>
 <body>
-  <nav class="nav-bar">
-    <div class="nav-logo">P ♡M</div>
-    <ul class="nav-links">
-      <li><a href="homepage/homepage.html" class="nav-link active">Home</a></li>
-      <li><a href="venue/venue.html" class="nav-link">Venue</a></li>
-      <li><a href="motif/motif.html" class="nav-link">Motif</a></li>
-      <li><a href="family/family.html" class="nav-link">Family</a></li>
-      <li><a href="entourage/entourage.html" class="nav-link">Entourage</a></li>
-      <li><a href="reception/reception.html" class="nav-link">Reception</a></li>
-      <li><a href="timeline/timeline.html" class="nav-link">Timeline</a></li>
-    </ul>
-  </nav>
+    <body>
+       <audio id="bgMusic" loop preload="auto">
+    <source src="wedding-music.mp3" type="audio/mpeg">
+</audio>
+        <div id="musicToggle" class="music-toggle">
+    <span class="music-icon">🔇</span>
+</div>
+        <nav class="nav-bar">
+            <div class="nav-logo">P ♡M</div>
+            <ul class="nav-links">
+                <li><a href="homepage.html" class="nav-link active">Home</a></li>
+                <li><a href="/www.PaulMyraWedd.invitation/venue/venue.html" class="nav-link">Venue</a></li>
+                <li><a href="/www.PaulMyraWedd.invitation/motif/motif.html" class="nav-link">Motif</a></li>
+                <li><a href="/www.PaulMyraWedd.invitation/family/family.html" class="nav-link">Family</a></li>
+                <li> <a href="/www.PaulMyraWedd.invitation/entourage/entourage.html" class="nav-link">Entourage</a></li>
+                <li> <a href="/www.PaulMyraWedd.invitation/reception/reception.html" class="nav-link">Reception</a></li>
+                <li><a href="/www.PaulMyraWedd.invitation/timeline/timeline.html" class="nav-link">Timeline</a></li>
+            </ul>
+        </nav>
 
-  <section class="hero-section" id="home">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <div class="flourish-top">∞</div>
-      <p class="hero-subtitle">Together with our families</p>
-      <h1 class="hero-names">Paul <span class="ampersand">&</span> Myra</h1>
-      <p class="hero-text">request the honor of your presence</p>
-      <div class="wedding-date">
-        <div class="date-line"></div>
-        <span>January 16, 2026</span>
-        <div class="date-line"></div>
-      </div>
-      <div class="flourish-bottom">∞</div>
-    </div>
-  </section>
+        <section class="hero-section" id="home">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="flourish-top">∞</div>
+                <p class="hero-subtitle">Together with our families</p>
+                <h1 class="hero-names">Paul <span class="ampersand">&</span> Myra</h1>
+                <p class="hero-text">request the honor of your presence</p>
+                <div class="wedding-date">
+                    <div class="date-line"></div>
+                    <span>January 16, 2026</span>
+                    <div class="date-line"></div>
+                </div>
+                <div class="flourish-bottom">∞</div>
+            </div>
+        </section>
 
-  <section class="countdown-section">
-    <h2 class="section-title">Counting Down to Our Special Day</h2>
-    <div class="countdown" id="countdown">
-      <div class="countdown-item">
-        <div class="countdown-number" id="days">00</div>
-        <div class="countdown-label">Days</div>
-      </div>
-      <div class="countdown-divider">:</div>
-      <div class="countdown-item">
-        <div class="countdown-number" id="hours">00</div>
-        <div class="countdown-label">Hours</div>
-      </div>
-      <div class="countdown-divider">:</div>
-      <div class="countdown-item">
-        <div class="countdown-number" id="minutes">00</div>
-        <div class="countdown-label">Minutes</div>
-      </div>
-      <div class="countdown-divider">:</div>
-      <div class="countdown-item">
-        <div class="countdown-number" id="seconds">00</div>
-        <div class="countdown-label">Seconds</div>
-      </div>
-    </div>
-  </section>
+        <section class="countdown-section">
+            <h2 class="section-title">Counting Down to Our Special Day</h2>
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <div class="countdown-number" id="days">00</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-divider">:</div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="hours">00</div>
+                    <div class="countdown-label">Hours</div>
+                </div>
+                <div class="countdown-divider">:</div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="minutes">00</div>
+                    <div class="countdown-label">Minutes</div>
+                </div>
+                <div class="countdown-divider">:</div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="seconds">00</div>
+                    <div class="countdown-label">Seconds</div>
+                </div>
+            </div>
+        </section>
 
-  <section class="quote-section">
-    <div class="quote-content">
-      <p class="quote-text">"Love is composed of a single soul inhabiting two bodies"</p>
-      <p class="quote-author">— Aristotle</p>
-    </div>
-  </section>
+        <section class="quote-section">
+            <div class="quote-content">
+                <p class="quote-text">"Love is composed of a single soul inhabiting two bodies"</p>
+                <p class="quote-author">— Aristotle</p>
+            </div>
+        </section>
 
-  <!-- homepage JS will be loaded dynamically by SPA -->
-  <script src="homepage/homepage.js"></script>
-</body>
+        <script src="homepage.js"></script>
+    </body>
 </html>
+
+
 
 
