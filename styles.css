@@ -71,15 +71,15 @@ body {
     pointer-events: none;
 }
 
-    .invitation.show {
-        opacity: 1;
-        transform: translateY(-220px);
-        pointer-events: auto;
-    }
+.invitation.show {
+    opacity: 1;
+    transform: translateY(-220px);
+    pointer-events: auto;
+}
 
-        .invitation.show:hover {
-            transform: translateY(-220px) scale(1.03);
-        }
+.invitation.show:hover {
+    transform: translateY(-220px) scale(1.03);
+}
 
 .invitation-inner {
     border: 2px solid #8B4513;
@@ -128,7 +128,7 @@ body {
 
 .invitation-hint {
     color: #D4A29C;
-    font-size: 20px;
+    font-size: 12px;
     margin-top: 16px;
     opacity: 0.7;
     font-family: 'Playfair Display', serif;
@@ -142,18 +142,18 @@ body {
     height: 220px;
     cursor: pointer;
     transition: transform 0.3s ease;
-    touch-action: manipulation; /* Better touch handling on mobile */
-    user-select: none; /* Prevent text selection on tap */
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-    .envelope:hover {
-        transform: scale(1.03);
-    }
+.envelope:hover {
+    transform: scale(1.03);
+}
 
-    .envelope.open:hover {
-        transform: scale(1);
-    }
+.envelope.open:hover {
+    transform: scale(1);
+}
 
 .envelope-body {
     position: absolute;
@@ -223,7 +223,7 @@ body {
     box-shadow: 0 4px 15px rgba(92, 10, 10, 0.4);
     z-index: 30;
     transition: opacity 0.3s ease;
-    pointer-events: none; /* Allow clicks to pass through */
+    pointer-events: none;
 }
 
 .envelope.open .wax-seal {
@@ -244,11 +244,11 @@ body {
     left: 50%;
     transform: translateX(-50%);
     color: #8B4513;
-    font-size: 24px;
+    font-size: 14px;
     animation: pulse 2s infinite;
     font-family: 'Playfair Display', serif;
     font-style: italic;
-    pointer-events: none; /* Don't block clicks */
+    pointer-events: none;
 }
 
 .envelope.open .tap-hint {
@@ -288,10 +288,10 @@ body {
     box-shadow: 0 4px 15px rgba(92, 10, 10, 0.3);
 }
 
-    .music-toggle:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(92, 10, 10, 0.5);
-    }
+.music-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(92, 10, 10, 0.5);
+}
 
 .music-icon {
     font-size: 24px;
@@ -321,28 +321,29 @@ body {
         height: 100px;
     }
 
+    /* BIGGER SEAL FOR MOBILE */
     .wax-seal {
         top: 50px;
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
     }
 
-        .wax-seal span {
-            font-size: 24px;
-        }
+    .wax-seal span {
+        font-size: 32px;
+    }
 
     .invitation {
         width: 250px;
         padding: 16px;
     }
 
-        .invitation.show {
-            transform: translateY(-200px);
-        }
+    .invitation.show {
+        transform: translateY(-200px);
+    }
 
-            .invitation.show:hover {
-                transform: translateY(-200px) scale(1.03);
-            }
+    .invitation.show:hover {
+        transform: translateY(-200px) scale(1.03);
+    }
 
     .invitation-inner {
         padding: 16px;
@@ -358,15 +359,15 @@ body {
     }
 
     .invitation-text {
-        font-size: 24px;
+        font-size: 14px;
     }
 
     .invitation-date {
-        font-size: 24px;
+        font-size: 14px;
     }
 
     .tap-hint {
-        font-size: 20px;
+        font-size: 12px;
         bottom: -35px;
     }
 }
@@ -385,30 +386,32 @@ body {
         height: 90px;
     }
 
+    /* BIGGER SEAL FOR SMALL PHONES */
     .wax-seal {
         top: 45px;
-        width: 70px;
-        height: 70px;
+        width: 85px;
+        height: 85px;
     }
 
-        .wax-seal span {
-            font-size: 20px;
-        }
+    .wax-seal span {
+        font-size: 28px;
+    }
 
     .invitation {
         width: 220px;
         padding: 12px;
     }
 
-        .invitation.show {
-            transform: translateY(-180px);
-        }
+    .invitation.show {
+        transform: translateY(-180px);
+    }
 
-            .invitation.show:hover {
-                transform: translateY(-180px) scale(1.03);
-            }
+    .invitation.show:hover {
+        transform: translateY(-180px) scale(1.03);
+    }
 
     .invitation-names {
         font-size: 22px;
     }
 }
+
