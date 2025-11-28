@@ -14,6 +14,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             e.preventDefault();
 
+            // Save music state before navigation
+            var bgMusic = document.getElementById('bgMusic');
+            if (bgMusic && !bgMusic.paused) {
+                sessionStorage.setItem('musicTime', bgMusic.currentTime);
+                sessionStorage.setItem('musicPlaying', 'true');
+            }
+
             // Add fade-out animation
             document.body.classList.add('fade-out');
 
@@ -24,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
 // Fade in animation on scroll
 document.addEventListener('DOMContentLoaded', function () {
     var attireCards = document.querySelectorAll('.attire-card, .color-palette-section');
@@ -52,63 +60,102 @@ document.addEventListener('DOMContentLoaded', function () {
     attireCards.forEach(function (card) {
         observer.observe(card);
     });
-});
-// Music Toggle Control
-document.addEventListener('DOMContentLoaded', function () {
-    var musicFrame = document.getElementById('musicFrame');
+
+    // Music Control - Continue from Homepage
+    var bgMusic = document.getElementById('bgMusic');
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
 
-    // Check if elements exist
-    if (!musicFrame || !musicToggle || !musicIcon) {
-        console.error('Music toggle elements not found');
-        return;
+    if (bgMusic) {
+        var musicState = sessionStorage.getItem('musicPlaying');
+        var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
+        var hasInteracted = sessionStorage.getItem('hasInteracted') === 'true';
+
+        // Create continue button
+        var continueBtn = document.createElement('div');
+        continueBtn.innerHTML = '🎵 Continue Music';
+        continueBtn.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #5C0A0A, #3D0707);
+            color: #F8F4F0;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: none;
+        `;
+        document.body.appendChild(continueBtn);
+
+        // Restore saved time
+        if (savedTime > 0) {
+            bgMusic.addEventListener('loadedmetadata', function() {
+                bgMusic.currentTime = savedTime;
+            }, { once: true });
+        }
+
+        // Function to start music
+        function startMusic() {
+            bgMusic.play().then(function() {
+                sessionStorage.setItem('musicPlaying', 'true');
+                continueBtn.style.display = 'none';
+                if (musicIcon && musicToggle) {
+                    musicIcon.textContent = '🔊';
+                    musicToggle.classList.remove('muted');
+                }
+            }).catch(function() {
+                continueBtn.style.display = 'block';
+            });
+        }
+
+        // Continue button click
+        continueBtn.addEventListener('click', function() {
+            startMusic();
+        });
+
+        // If music was playing, try to continue
+        if (musicState === 'true' && hasInteracted) {
+            setTimeout(function() {
+                bgMusic.play().then(function() {
+                    continueBtn.style.display = 'none';
+                    if (musicIcon && musicToggle) {
+                        musicIcon.textContent = '🔊';
+                        musicToggle.classList.remove('muted');
+                    }
+                }).catch(function() {
+                    continueBtn.style.display = 'block';
+                });
+            }, 500);
+        }
+
+        // Save time periodically
+        setInterval(function () {
+            if (!bgMusic.paused) {
+                sessionStorage.setItem('musicTime', bgMusic.currentTime);
+            }
+        }, 1000);
+
+        // Toggle button
+        if (musicToggle) {
+            musicToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (bgMusic.paused) {
+                    startMusic();
+                } else {
+                    bgMusic.pause();
+                    sessionStorage.setItem('musicPlaying', 'false');
+                    continueBtn.style.display = 'none';
+                    if (musicIcon) {
+                        musicIcon.textContent = '🔇';
+                        musicToggle.classList.add('muted');
+                    }
+                }
+            });
+        }
     }
-
-    // Wait for iframe to load
-    musicFrame.onload = function () {
-        // Get initial music state and start music
-        try {
-            if (musicFrame.contentWindow) {
-                setTimeout(function() {
-                    musicFrame.contentWindow.postMessage('startMusic', '*');
-                    musicFrame.contentWindow.postMessage('getMusicState', '*');
-                }, 200);
-            }
-        } catch (e) {
-            console.error('Error communicating with music frame:', e);
-        }
-    };
-
-    // Immediate attempt
-    setTimeout(function() {
-        if (musicFrame.contentWindow) {
-            try {
-                musicFrame.contentWindow.postMessage('startMusic', '*');
-            } catch (e) {}
-        }
-    }, 500);
-
-    // Listen for music state updates
-    window.addEventListener('message', function (event) {
-        if (event.data.musicPlaying !== undefined) {
-            if (event.data.musicPlaying) {
-                musicIcon.textContent = '🔊';
-                musicToggle.classList.remove('muted');
-            } else {
-                musicIcon.textContent = '🔇';
-                musicToggle.classList.add('muted');
-            }
-        }
-    });
-
-    // Toggle music button
-    musicToggle.addEventListener('click', function (e) {
-        e.stopPropagation();
-        try {
-            musicFrame.contentWindow.postMessage('toggleMusic', '*');
-        } catch (e) {
-            console.error('Error toggling music:', e);
-        }
-    });
 });
