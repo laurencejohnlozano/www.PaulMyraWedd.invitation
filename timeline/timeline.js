@@ -27,14 +27,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Fade in animation on scroll
 document.addEventListener('DOMContentLoaded', function () {
-    var timelineEvents = document.querySelectorAll('.timeline-event');
+    var timelineItems = document.querySelectorAll('.timeline-item');
     var thankYouSection = document.querySelector('.thank-you-section');
 
     var observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+                entry.target.style.transform = 'scale(1) translateY(0)';
                 observer.unobserve(entry.target);
             }
         });
@@ -42,8 +42,8 @@ document.addEventListener('DOMContentLoaded', function () {
         threshold: 0.1
     });
 
-    timelineEvents.forEach(function (event) {
-        observer.observe(event);
+    timelineItems.forEach(function (item) {
+        observer.observe(item);
     });
 
     if (thankYouSection) {
@@ -128,4 +128,3 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-
