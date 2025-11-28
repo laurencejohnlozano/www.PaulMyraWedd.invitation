@@ -1,4 +1,4 @@
-﻿// Smooth Page Transition
+// Smooth Page Transition
 document.addEventListener('DOMContentLoaded', function () {
     // Intercept all navigation links
     var links = document.querySelectorAll('a[href$=".html"]');
@@ -27,23 +27,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Fade in animation on scroll
 document.addEventListener('DOMContentLoaded', function () {
-    var timelineItems = document.querySelectorAll('.timeline-item');
+    var timelineEvents = document.querySelectorAll('.timeline-event');
     var thankYouSection = document.querySelector('.thank-you-section');
 
     var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry, index) {
+        entries.forEach(function (entry) {
             if (entry.isIntersecting) {
-                setTimeout(function () {
-                    entry.target.style.opacity = '0';
-                    entry.target.style.transform = 'translateY(30px)';
-
-                    setTimeout(function () {
-                        entry.target.style.transition = 'all 0.8s ease';
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }, 100);
-                }, index * 100);
-
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
                 observer.unobserve(entry.target);
             }
         });
@@ -51,12 +42,30 @@ document.addEventListener('DOMContentLoaded', function () {
         threshold: 0.1
     });
 
-    timelineItems.forEach(function (item) {
-        observer.observe(item);
+    timelineEvents.forEach(function (event) {
+        observer.observe(event);
     });
 
     if (thankYouSection) {
-        observer.observe(thankYouSection);
+        thankYouSection.style.opacity = '0';
+        thankYouSection.style.transform = 'translateY(30px)';
+        
+        var thankYouObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    setTimeout(function () {
+                        entry.target.style.transition = 'all 0.8s ease';
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, 100);
+                    thankYouObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        thankYouObserver.observe(thankYouSection);
     }
 });
 
@@ -77,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Get initial music state and start music
         try {
             if (musicFrame.contentWindow) {
-                setTimeout(function () {
+                setTimeout(function() {
                     musicFrame.contentWindow.postMessage('startMusic', '*');
                     musicFrame.contentWindow.postMessage('getMusicState', '*');
                 }, 200);
@@ -88,11 +97,11 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Immediate attempt
-    setTimeout(function () {
+    setTimeout(function() {
         if (musicFrame.contentWindow) {
             try {
                 musicFrame.contentWindow.postMessage('startMusic', '*');
-            } catch (e) { }
+            } catch (e) {}
         }
     }, 500);
 
@@ -118,4 +127,5 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error toggling music:', e);
         }
     });
-});// JavaScript source code
+});
+
