@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (bgMusic) {
         var musicState = sessionStorage.getItem('musicPlaying');
         var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
-        var hasInteracted = sessionStorage.getItem('hasInteracted') === 'true';
 
         // Create continue button
         var continueBtn = document.createElement('div');
@@ -101,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
         function startMusic() {
             bgMusic.play().then(function() {
                 sessionStorage.setItem('musicPlaying', 'true');
+                sessionStorage.setItem('hasInteracted', 'true');
                 continueBtn.style.display = 'none';
                 if (musicIcon && musicToggle) {
                     musicIcon.textContent = '🔊';
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // If music was playing, try to continue
-        if (musicState === 'true' && hasInteracted) {
+        if (musicState === 'true') {
             setTimeout(function() {
                 bgMusic.play().then(function() {
                     continueBtn.style.display = 'none';
@@ -157,5 +157,3 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 });
-
-
