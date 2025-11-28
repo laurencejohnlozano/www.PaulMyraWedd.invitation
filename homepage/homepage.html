@@ -18,8 +18,8 @@
         <nav class="nav-bar">
             <div class="nav-logo">P ♡M</div>
             <ul class="nav-links">
-                <li><a href="/homepage/homepage.html" class="nav-link active">Home</a></li>
-                <li><a href="/venue/venue.html" class="nav-link">Venue</a></li>
+                <li><a href="homepage.html" class="nav-link active">Home</a></li>
+                <li><a href="/www.PaulMyraWedd.invitation/venue/venue.html" class="nav-link">Venue</a></li>
                 <li><a href="/www.PaulMyraWedd.invitation/motif/motif.html" class="nav-link">Motif</a></li>
                 <li><a href="/www.PaulMyraWedd.invitation/family/family.html" class="nav-link">Family</a></li>
                 <li> <a href="/www.PaulMyraWedd.invitation/entourage/entourage.html" class="nav-link">Entourage</a></li>
@@ -77,19 +77,6 @@
         </section>
 
         <script src="homepage.js"></script>
-
-        <script>
-document.querySelectorAll("a[href]").forEach(a => {
-    a.addEventListener("click", function(e) {
-        const href = this.getAttribute("href");
-        if (href.endsWith(".html")) {
-            e.preventDefault();
-            parent.postMessage({ navigate: href }, "*");
-        }
-    });
-});
-</script>
-
     </body>
 </html>
 
@@ -97,7 +84,7 @@ document.querySelectorAll("a[href]").forEach(a => {
 
 
 
-</html>
+
 
 
 
