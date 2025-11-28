@@ -32,33 +32,36 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Music Control & Animations
+// Fade in animation on scroll
 document.addEventListener('DOMContentLoaded', function () {
-    
-    // --- 1. Gallery Animation ---
-    var galleryItems = document.querySelectorAll('.gallery-item');
-    var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '0';
-                entry.target.style.transform = 'translateY(30px)';
+    var attireCards = document.querySelectorAll('.attire-card, .color-palette-section');
 
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry, index) {
+            if (entry.isIntersecting) {
                 setTimeout(function () {
-                    entry.target.style.transition = 'all 0.8s ease';
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }, 100);
+                    entry.target.style.opacity = '0';
+                    entry.target.style.transform = 'translateY(30px)';
+
+                    setTimeout(function () {
+                        entry.target.style.transition = 'all 0.8s ease';
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 150);
 
                 observer.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1 });
-
-    galleryItems.forEach(function (item) {
-        observer.observe(item);
+    }, {
+        threshold: 0.1
     });
 
-    // --- 2. Music Logic ---
+    attireCards.forEach(function (card) {
+        observer.observe(card);
+    });
+
+    // Music Control - Continue from Homepage
     var bgMusic = document.getElementById('bgMusic');
     var musicToggle = document.getElementById('musicToggle');
     var musicIcon = document.querySelector('.music-icon');
@@ -71,11 +74,20 @@ document.addEventListener('DOMContentLoaded', function () {
         var continueBtn = document.createElement('div');
         continueBtn.innerHTML = '🎵 Continue Music';
         continueBtn.style.cssText = `
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(135deg, #5C0A0A, #3D0707); color: #F8F4F0;
-            padding: 12px 25px; border-radius: 30px; font-family: 'Playfair Display', serif;
-            font-size: 14px; cursor: pointer; z-index: 10000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: none;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #5C0A0A, #3D0707);
+            color: #F8F4F0;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: none;
         `;
         document.body.appendChild(continueBtn);
 
@@ -86,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }, { once: true });
         }
 
+        // Function to start music
         function startMusic() {
             bgMusic.play().then(function() {
                 sessionStorage.setItem('musicPlaying', 'true');
@@ -105,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
             startMusic();
         });
 
-        // Try auto-continue if music was playing
+        // If music was playing, try to continue
         if (musicState === 'true') {
             setTimeout(function() {
                 bgMusic.play().then(function() {
@@ -120,14 +133,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 500);
         }
 
-        // Save time constantly
+        // Save time periodically
         setInterval(function () {
             if (!bgMusic.paused) {
                 sessionStorage.setItem('musicTime', bgMusic.currentTime);
             }
         }, 1000);
 
-        // Toggle Button Click
+        // Toggle button
         if (musicToggle) {
             musicToggle.addEventListener('click', function (e) {
                 e.stopPropagation();
