@@ -1,82 +1,205 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Music Player</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: transparent;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #5C0A0A, #3D0707);
+            border-radius: 50px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(248, 244, 240, 0.3);
+            z-index: 99999;
+            transition: all 0.3s ease;
+        }
+        
+        .music-player:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .play-btn {
+            background: rgba(248, 244, 240, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .play-btn:hover {
+            background: rgba(248, 244, 240, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .music-info {
+            color: #F8F4F0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .song-title {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .time-display {
+            font-size: 11px;
+            opacity: 0.8;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .progress-bar {
+            width: 120px;
+            height: 4px;
+            background: rgba(248, 244, 240, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #F8F4F0;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        /* Mobile: Show compact version */
+        @media (max-width: 768px) {
+            .music-player {
+                bottom: 80px;
+                padding: 0;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                justify-content: center;
+            }
+            
+            .music-info {
+                display: none;
+            }
+            
+            .play-btn {
+                background: transparent;
+            }
+        }
+    </style>
 </head>
 <body>
-  <audio id="bgMusic" loop preload="auto">
-    <source src="homepage/wedding-music.mp3" type="audio/mpeg">
-  </audio>
-
-  <script>
-    var bgMusic = document.getElementById('bgMusic');
-    // persist state/time in sessionStorage
-    var savedTime = parseFloat(sessionStorage.getItem('musicTime') || '0');
-    if (!isNaN(savedTime) && savedTime > 0) {
-      try { bgMusic.currentTime = savedTime; } catch (e) {}
-    }
-
-    function notifyState() {
-      parent.postMessage({ musicPlaying: !bgMusic.paused }, '*');
-    }
-
-    // Try to play if session says it was playing
-    if (sessionStorage.getItem('musicPlaying') === 'true') {
-      bgMusic.muted = true;
-      bgMusic.play().then(function() {
-        setTimeout(function() {
-          bgMusic.muted = false;
-          notifyState();
-        }, 150);
-      }).catch(function() {
-        notifyState();
-      });
-    } else {
-      notifyState();
-    }
-
-    // Save time while playing
-    setInterval(function() {
-      if (!bgMusic.paused) {
-        sessionStorage.setItem('musicTime', bgMusic.currentTime);
-        sessionStorage.setItem('musicPlaying', 'true');
-      }
-    }, 1000);
-
-    window.addEventListener('message', function (ev) {
-      var data = ev.data;
-      if (data === 'toggleMusic') {
-        if (bgMusic.paused) {
-          bgMusic.play().then(function(){ sessionStorage.setItem('musicPlaying','true'); parent.postMessage({musicPlaying:true},'*'); }).catch(function(){ parent.postMessage({musicPlaying:false},'*'); });
-        } else {
-          bgMusic.pause();
-          sessionStorage.setItem('musicPlaying','false');
-          parent.postMessage({musicPlaying:false},'*');
+    <div class="music-player">
+        <button class="play-btn" id="playBtn">▶️</button>
+        <div class="music-info">
+            <div class="song-title">Wedding Music</div>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+        </div>
+    </div>
+    
+    <audio id="bgMusic" loop>
+        <source src="/www.PaulMyraWedd.invitation/homepage/wedding-music.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        const bgMusic = document.getElementById('bgMusic');
+        const playBtn = document.getElementById('playBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const timeDisplay = document.getElementById('timeDisplay');
+        
+        // Load saved state
+        const wasPlaying = localStorage.getItem('musicPlaying') === 'true';
+        const savedTime = parseFloat(localStorage.getItem('musicTime') || '0');
+        
+        bgMusic.addEventListener('loadedmetadata', function() {
+            if (savedTime > 0) {
+                bgMusic.currentTime = savedTime;
+            }
+            updateTimeDisplay();
+        });
+        
+        if (wasPlaying) {
+            setTimeout(function() {
+                bgMusic.play().then(function() {
+                    updatePlayButton();
+                }).catch(function() {});
+            }, 300);
         }
-      } else if (data === 'getMusicState') {
-        parent.postMessage({ musicPlaying: !bgMusic.paused }, '*');
-      } else if (data === 'startMusic') {
-        bgMusic.play().then(function(){ sessionStorage.setItem('musicPlaying','true'); parent.postMessage({musicPlaying:true},'*'); }).catch(function(){ parent.postMessage({musicPlaying:false},'*'); });
-      }
-    }, false);
-
-    window.addEventListener('beforeunload', function () {
-      if (!bgMusic.paused) {
-        sessionStorage.setItem('musicTime', bgMusic.currentTime);
-        sessionStorage.setItem('musicPlaying', 'true');
-      }
-    });
-
-    // allow user interaction to start music when needed
-    ['touchstart','click','keydown'].forEach(evt => {
-      document.addEventListener(evt, function handler() {
-        if (bgMusic.paused && sessionStorage.getItem('musicPlaying') !== 'false') {
-          bgMusic.play().catch(()=>{});
+        
+        playBtn.addEventListener('click', function() {
+            if (bgMusic.paused) {
+                bgMusic.play();
+                localStorage.setItem('musicPlaying', 'true');
+            } else {
+                bgMusic.pause();
+                localStorage.setItem('musicPlaying', 'false');
+            }
+            updatePlayButton();
+        });
+        
+        progressBar.addEventListener('click', function(e) {
+            const rect = progressBar.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            bgMusic.currentTime = percent * bgMusic.duration;
+        });
+        
+        function updatePlayButton() {
+            playBtn.textContent = bgMusic.paused ? '▶️' : '⏸️';
         }
-        document.removeEventListener(evt, handler);
-      }, {passive:true});
-    });
-  </script>
+        
+        function updateProgress() {
+            const percent = (bgMusic.currentTime / bgMusic.duration) * 100;
+            progressFill.style.width = percent + '%';
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+        
+        function updateTimeDisplay() {
+            const current = formatTime(bgMusic.currentTime);
+            const total = formatTime(bgMusic.duration || 0);
+            timeDisplay.textContent = current + ' / ' + total;
+        }
+        
+        bgMusic.addEventListener('timeupdate', function() {
+            updateProgress();
+            updateTimeDisplay();
+            localStorage.setItem('musicTime', bgMusic.currentTime);
+        });
+        
+        bgMusic.addEventListener('play', updatePlayButton);
+        bgMusic.addEventListener('pause', updatePlayButton);
+    </script>
 </body>
 </html>
