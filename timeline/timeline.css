@@ -519,3 +519,112 @@ body {
         font-size: 17px !important;
     }
 }
+
+/* Contact Section */
+.contact-section {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(139, 69, 19, 0.2);
+    border-radius: 20px;
+    padding: 50px 50px;
+    margin-top: 40px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(92, 10, 10, 0.12);
+}
+
+.contact-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #5C0A0A;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.contact-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #8B4513;
+    letter-spacing: 0.5px;
+}
+
+.contact-link {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: #5C0A0A;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(92, 10, 10, 0.3);
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+}
+
+.contact-link:hover {
+    color: #8B4513;
+    border-bottom-color: #8B4513;
+}
+
+/* Mobile Responsive for Contact Section */
+@media screen and (max-width: 768px) {
+    .contact-section {
+        padding: 40px 30px;
+        margin-top: 35px;
+    }
+
+    .contact-section h3 {
+        font-size: 19px;
+        margin-bottom: 25px;
+    }
+
+    .contact-item {
+        gap: 8px;
+    }
+
+    .contact-label {
+        font-size: 14px;
+    }
+
+    .contact-link {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .contact-section {
+        padding: 35px 20px;
+        margin-top: 30px;
+    }
+
+    .contact-section h3 {
+        font-size: 17px;
+        margin-bottom: 20px;
+    }
+
+    .contact-item {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .contact-label {
+        font-size: 13px;
+    }
+
+    .contact-link {
+        font-size: 13px;
+        word-break: break-all;
+    }
+}
