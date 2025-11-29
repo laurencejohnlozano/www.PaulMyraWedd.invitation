@@ -414,3 +414,172 @@ body {
         font-size: 22px;
     }
 }
+/* ═══════════════════════════════════════════════════════════════
+   ENVELOPE PAGE - TABLET/iPAD FIX
+   Add this to styles.css (envelope page)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Tablet/iPad Responsive (769px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    
+    /* Envelope Size Adjustment */
+    .envelope {
+        width: 350px;
+        height: 240px;
+    }
+    
+    .envelope-flap {
+        height: 130px;
+    }
+    
+    .envelope-bottom {
+        height: 130px;
+    }
+    
+    /* Wax Seal - Keep visible and properly sized */
+    .wax-seal {
+        top: 65px;
+        width: 70px;
+        height: 70px;
+    }
+    
+    .wax-seal span {
+        font-size: 20px;
+    }
+    
+    /* Invitation Card */
+    .invitation {
+        width: 320px;
+        padding: 28px;
+    }
+    
+    .invitation.show {
+        transform: translateY(-250px);
+    }
+    
+    .invitation.show:hover {
+        transform: translateY(-250px) scale(1.03);
+    }
+    
+    .invitation-inner {
+        padding: 24px;
+    }
+    
+    .invitation-names {
+        font-size: 36px;
+    }
+    
+    .invitation-subtitle {
+        font-size: 11px;
+        letter-spacing: 2.5px;
+    }
+    
+    .invitation-text {
+        font-size: 17px;
+    }
+    
+    .invitation-date {
+        font-size: 17px;
+    }
+    
+    .tap-hint {
+        font-size: 14px;
+        bottom: -45px;
+    }
+    
+    /* Music Toggle Button - if present */
+    .music-toggle {
+        bottom: 50px;
+        right: 50px;
+        width: 55px;
+        height: 55px;
+    }
+    
+    .music-icon {
+        font-size: 22px;
+    }
+}
+
+/* Large Tablets/Small Desktop (1025px - 1366px) */
+@media screen and (min-width: 1025px) and (max-width: 1366px) {
+    
+    .envelope {
+        width: 380px;
+        height: 260px;
+    }
+    
+    .envelope-flap {
+        height: 140px;
+    }
+    
+    .envelope-bottom {
+        height: 140px;
+    }
+    
+    .wax-seal {
+        top: 70px;
+        width: 75px;
+        height: 75px;
+    }
+    
+    .wax-seal span {
+        font-size: 22px;
+    }
+    
+    .invitation {
+        width: 340px;
+    }
+    
+    .invitation.show {
+        transform: translateY(-260px);
+    }
+    
+    .invitation.show:hover {
+        transform: translateY(-260px) scale(1.03);
+    }
+}
+
+/* iPad Pro Portrait (1024px width) - Specific Fix */
+@media screen and (width: 1024px) and (orientation: portrait) {
+    
+    .envelope {
+        width: 360px;
+        height: 245px;
+    }
+    
+    .wax-seal {
+        width: 72px;
+        height: 72px;
+    }
+    
+    .wax-seal span {
+        font-size: 21px;
+    }
+}
+
+/* iPad Pro Landscape (1366px width) - Specific Fix */
+@media screen and (width: 1366px) and (orientation: landscape) {
+    
+    .envelope {
+        width: 400px;
+        height: 275px;
+    }
+    
+    .envelope-flap {
+        height: 150px;
+    }
+    
+    .envelope-bottom {
+        height: 150px;
+    }
+    
+    .wax-seal {
+        top: 75px;
+        width: 80px;
+        height: 80px;
+    }
+    
+    .wax-seal span {
+        font-size: 24px;
+    }
+}
