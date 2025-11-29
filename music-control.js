@@ -35,7 +35,7 @@
     var audio = document.createElement('audio');
     audio.id = 'globalMusic';
     audio.loop = true;
-    audio.src = '/www.PaulMyraWedd.invitation/homepage/wedding-music.mp3';
+    audio.src = '/homepage/wedding-music.mp3';
     
     // Set current time immediately (before appending)
     if (savedTime > 0) {
