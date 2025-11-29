@@ -460,4 +460,127 @@ body {
         font-size: 20px;
     }
 }
+/* ═══════════════════════════════════════════════════════════════
+   UNIVERSAL TABLET/iPAD FIX
+   Add this to ALL your CSS files (homepage, venue, motif, etc.)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Tablet/iPad Responsive (769px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    
+    /* Fix Navigation Bar */
+    .nav-bar {
+        padding: 16px 25px;
+        flex-wrap: wrap;
+    }
+    
+    .nav-logo {
+        font-size: 22px;
+        letter-spacing: 1px;
+    }
+    
+    .nav-links {
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        margin-top: 12px;
+    }
+    
+    .nav-link {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        padding: 4px 8px;
+    }
+    
+    /* Fix Page Header */
+    .page-header {
+        padding-top: 160px;
+    }
+    
+    .names-header {
+        font-size: 42px;
+    }
+    
+    .page-header h1 {
+        font-size: 32px;
+    }
+    
+    /* Fix Main Content Width */
+    .timeline-main,
+    .venue-main,
+    .motif-main,
+    .family-main,
+    .entourage-main,
+    .reception-main {
+        max-width: 90%;
+        padding: 0 30px 100px;
+    }
+    
+    /* Fix Music Button Position */
+    #musicPlayerBtn {
+        bottom: 120px !important;
+        right: 25px !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 22px !important;
+    }
+    
+    /* Fix Back Button */
+    .back-btn {
+        bottom: 50px;
+        padding: 12px 28px;
+        font-size: 11px;
+    }
+}
+
+/* Large Tablets/Small Desktop (1025px - 1366px) */
+@media screen and (min-width: 1025px) and (max-width: 1366px) {
+    
+    .nav-bar {
+        padding: 18px 40px;
+    }
+    
+    .nav-logo {
+        font-size: 24px;
+    }
+    
+    .nav-links {
+        gap: 28px;
+    }
+    
+    .nav-link {
+        font-size: 12px;
+    }
+}
+
+/* iPad Pro Portrait (1024px width) - Specific Fix */
+@media screen and (width: 1024px) and (orientation: portrait) {
+    
+    .nav-links {
+        gap: 15px !important;
+    }
+    
+    .nav-link {
+        font-size: 9px !important;
+        letter-spacing: 1px !important;
+        padding: 4px 6px !important;
+    }
+}
+
+/* iPad Pro Landscape (1366px width) - Specific Fix */
+@media screen and (width: 1366px) and (orientation: landscape) {
+    
+    .nav-bar {
+        padding: 20px 50px;
+    }
+    
+    .nav-links {
+        gap: 32px;
+    }
+    
+    .nav-link {
+        font-size: 13px;
+    }
+}
 
