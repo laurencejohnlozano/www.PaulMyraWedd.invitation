@@ -1,0 +1,549 @@
+﻿/* Page Transition Animation */
+body {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+body.fade-out {
+    animation: fadeOut 0.4s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, #F8F4F0 0%, #ECDDD1 50%, #D4B5A0 100%);
+    color: #5C0A0A;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+/* Navigation Bar */
+.nav-bar {
+    width: 100%;
+    background: rgba(248, 244, 240, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+    box-shadow: 0 2px 15px rgba(92, 10, 10, 0.1);
+}
+
+.nav-logo {
+    color: #5C0A0A;
+    font-size: 28px;
+    font-weight: 600;
+    font-family: 'Great Vibes', cursive;
+    letter-spacing: 2px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-link {
+    color: #5C0A0A;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 5px 0;
+    font-family: 'Playfair Display', serif;
+}
+
+    .nav-link:hover {
+        color: #8B4513;
+    }
+
+    .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 1px;
+        background: #8B4513;
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+        width: 100%;
+    }
+
+    .nav-link.active {
+        color: #8B4513;
+    }
+
+/* Page Header */
+.page-header {
+    text-align: center;
+    padding: 140px 40px 80px;
+}
+
+.names-header {
+    font-family: 'Great Vibes', cursive;
+    font-size: 72px;
+    font-weight: 400;
+    color: #5C0A0A;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.flourish {
+    font-size: 50px;
+    color: #8B4513;
+    opacity: 0.6;
+    margin: 25px 0;
+}
+
+.page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 600;
+    color: #5C0A0A;
+    margin: 30px 0 20px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.header-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: #8B4513;
+    margin: 15px 0;
+    letter-spacing: 1px;
+}
+
+/* Gallery Main Section */
+.gallery-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+}
+
+/* Photo Grid - Landscape Layout */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+}
+
+.photo-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.4);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    cursor: pointer;
+    aspect-ratio: 16 / 10;
+}
+
+    .photo-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(92, 10, 10, 0.25);
+    }
+
+.photo-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+    .photo-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.6s ease;
+    }
+
+.photo-item:hover .photo-frame img {
+    transform: scale(1.08);
+}
+
+/* Photo Overlay */
+.photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient( 180deg, rgba(92, 10, 10, 0.7) 0%, transparent 30%, transparent 70%, rgba(92, 10, 10, 0.8) 100% );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 20px;
+}
+
+.photo-item:hover .photo-overlay {
+    opacity: 1;
+}
+
+.photo-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: #F8F4F0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Closing Message */
+.closing-message {
+    text-align: center;
+    padding: 120px 40px 60px;
+    max-width: 800px;
+    margin: 80px auto 0;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(139, 69, 19, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(92, 10, 10, 0.12);
+}
+
+.decorative-line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #C5A572, transparent);
+    margin: 0 auto 30px;
+}
+
+.flourish-large {
+    font-size: 60px;
+    color: #8B4513;
+    opacity: 0.5;
+    margin: 20px 0;
+}
+
+.closing-message h2 {
+    font-family: 'Great Vibes', cursive;
+    font-size: 64px;
+    font-weight: 400;
+    color: #5C0A0A;
+    margin: 30px 0 35px;
+    letter-spacing: 2px;
+}
+
+.closing-message p {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: #8B4513;
+    margin: 20px 0;
+    line-height: 1.8;
+}
+
+.final-quote {
+    font-size: 20px !important;
+    font-weight: 600;
+    color: #5C0A0A !important;
+    margin: 40px 0 30px !important;
+    padding: 0 30px;
+}
+
+/* Lightbox Modal */
+.lightbox {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.lightbox-content {
+    max-width: 90%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 30px;
+    right: 50px;
+    font-size: 50px;
+    color: #F8F4F0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 300;
+    line-height: 1;
+}
+
+    .lightbox-close:hover {
+        color: #C5A572;
+        transform: scale(1.2);
+    }
+
+.lightbox-caption {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #F8F4F0;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-style: italic;
+    text-align: center;
+    padding: 15px 30px;
+    background: rgba(92, 10, 10, 0.8);
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+}
+
+.lightbox-prev,
+.lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(92, 10, 10, 0.8);
+    color: #F8F4F0;
+    border: none;
+    font-size: 40px;
+    padding: 20px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.lightbox-prev {
+    left: 30px;
+}
+
+.lightbox-next {
+    right: 30px;
+}
+
+    .lightbox-prev:hover,
+    .lightbox-next:hover {
+        background: rgba(139, 69, 19, 0.9);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+/* Back Button */
+.back-btn {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 14px 35px;
+    background: linear-gradient(135deg, #5C0A0A, #3D0707);
+    color: #F8F4F0;
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    border-radius: 50px;
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(92, 10, 10, 0.3);
+}
+
+    .back-btn:hover {
+        background: linear-gradient(135deg, #3D0707, #5C0A0A);
+        transform: translateX(-50%) translateY(-3px);
+        box-shadow: 0 6px 20px rgba(92, 10, 10, 0.5);
+    }
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    .nav-bar {
+        padding: 16px 30px;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .nav-logo {
+        font-size: 24px;
+    }
+
+    .nav-links {
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav-link {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+    }
+
+    .page-header {
+        padding: 120px 20px 50px;
+    }
+
+    .names-header {
+        font-size: 48px;
+    }
+
+    .page-header h1 {
+        font-size: 32px;
+        letter-spacing: 2px;
+    }
+
+    .header-subtitle {
+        font-size: 16px;
+    }
+
+    .flourish {
+        font-size: 40px;
+    }
+
+    .gallery-main {
+        padding: 0 20px 80px;
+    }
+
+    .photo-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+    }
+
+    .photo-item {
+        aspect-ratio: 16 / 10;
+    }
+
+    .photo-number {
+        font-size: 28px;
+    }
+
+    .closing-message {
+        padding: 80px 25px 50px;
+        margin-top: 60px;
+    }
+
+        .closing-message h2 {
+            font-size: 48px;
+        }
+
+        .closing-message p {
+            font-size: 16px;
+        }
+
+    .final-quote {
+        font-size: 18px !important;
+        padding: 0 15px;
+    }
+
+    .flourish-large {
+        font-size: 50px;
+    }
+
+    .lightbox-close {
+        top: 15px;
+        right: 20px;
+        font-size: 40px;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+        font-size: 30px;
+        padding: 15px 20px;
+    }
+
+    .lightbox-prev {
+        left: 15px;
+    }
+
+    .lightbox-next {
+        right: 15px;
+    }
+
+    .lightbox-caption {
+        font-size: 14px;
+        padding: 12px 20px;
+        bottom: 30px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .page-header {
+        padding: 100px 15px 40px;
+    }
+
+    .names-header {
+        font-size: 38px;
+    }
+
+    .page-header h1 {
+        font-size: 26px;
+    }
+
+    .photo-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .photo-item {
+        aspect-ratio: 16 / 10;
+    }
+
+    .closing-message {
+        padding: 60px 20px 40px;
+    }
+
+        .closing-message h2 {
+            font-size: 42px;
+        }
+
+        .closing-message p {
+            font-size: 15px;
+        }
+
+    .final-quote {
+        font-size: 16px !important;
+    }
+}
